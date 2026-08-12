@@ -29,14 +29,12 @@
         <aside class="dashboard-sidebar" aria-label="Dashboard navigation">
             <a class="dashboard-brand" href="{{ route('home') }}" aria-label="SSF Marketing home">
                 <img src="{{ url('frontend/assets/images/logo/logo.png') }}" alt="SSF Marketing">
-                <span>SSF Marketing</span>
             </a>
 
             <nav class="dashboard-nav">
                 @foreach ($navItems as $key => $item)
                     <a class="{{ $page === $key ? 'active' : '' }}" href="{{ $item['url'] }}"><i class="fa-solid {{ $item['icon'] }}"></i><span>{{ $item['label'] }}</span></a>
                 @endforeach
-                <a href="{{ route('home') }}"><i class="fa-solid fa-globe"></i><span>Website</span></a>
             </nav>
 
             <div class="sidebar-summary">
@@ -346,14 +344,14 @@
     @if ($canManageUsers)
         <section class="dashboard-modal" id="campaign-create" role="dialog" aria-modal="true" aria-labelledby="campaign-create-title" hidden>
             <div class="modal-card"><button class="modal-close" type="button" data-modal-close aria-label="Close"><i class="fa-solid fa-xmark"></i></button><div class="modal-head"><span class="section-label">New campaign</span><h2 id="campaign-create-title">Add Campaign</h2></div>
-                @include('frontend.inc.dashboard-campaign-form', ['action' => route('dashboard.campaigns.store'), 'method' => null, 'campaign' => null, 'statusLabels' => $statusLabels])
+                @include('dashboard.inc.dashboard-campaign-form', ['action' => route('dashboard.campaigns.store'), 'method' => null, 'campaign' => null, 'statusLabels' => $statusLabels])
             </div>
         </section>
 
         @foreach ($campaigns as $campaign)
             <section class="dashboard-modal" id="campaign-edit-{{ $campaign->id }}" role="dialog" aria-modal="true" aria-labelledby="campaign-edit-title-{{ $campaign->id }}" hidden>
                 <div class="modal-card"><button class="modal-close" type="button" data-modal-close aria-label="Close"><i class="fa-solid fa-xmark"></i></button><div class="modal-head"><span class="section-label">Edit campaign</span><h2 id="campaign-edit-title-{{ $campaign->id }}">{{ $campaign->name }}</h2></div>
-                    @include('frontend.inc.dashboard-campaign-form', ['action' => route('dashboard.campaigns.update', $campaign), 'method' => 'PUT', 'campaign' => $campaign, 'statusLabels' => $statusLabels])
+                    @include('dashboard.inc.dashboard-campaign-form', ['action' => route('dashboard.campaigns.update', $campaign), 'method' => 'PUT', 'campaign' => $campaign, 'statusLabels' => $statusLabels])
                 </div>
             </section>
         @endforeach
@@ -361,55 +359,55 @@
 
         <section class="dashboard-modal" id="review-create" role="dialog" aria-modal="true" aria-labelledby="review-create-title" hidden>
             <div class="modal-card"><button class="modal-close" type="button" data-modal-close aria-label="Close"><i class="fa-solid fa-xmark"></i></button><div class="modal-head"><span class="section-label">New review</span><h2 id="review-create-title">Add Review</h2></div>
-                @include('frontend.inc.dashboard-review-form', ['action' => route('dashboard.reviews.store'), 'method' => null, 'reviewRecord' => null])
+                @include('dashboard.inc.dashboard-review-form', ['action' => route('dashboard.reviews.store'), 'method' => null, 'reviewRecord' => null])
             </div>
         </section>
 
         @foreach ($reviews as $review)
             <section class="dashboard-modal" id="review-edit-{{ $review->id }}" role="dialog" aria-modal="true" aria-labelledby="review-edit-title-{{ $review->id }}" hidden>
                 <div class="modal-card"><button class="modal-close" type="button" data-modal-close aria-label="Close"><i class="fa-solid fa-xmark"></i></button><div class="modal-head"><span class="section-label">Edit review</span><h2 id="review-edit-title-{{ $review->id }}">{{ $review->client_name }}</h2></div>
-                    @include('frontend.inc.dashboard-review-form', ['action' => route('dashboard.reviews.update', $review), 'method' => 'PUT', 'reviewRecord' => $review])
+                    @include('dashboard.inc.dashboard-review-form', ['action' => route('dashboard.reviews.update', $review), 'method' => 'PUT', 'reviewRecord' => $review])
                 </div>
             </section>
         @endforeach
 
         <section class="dashboard-modal" id="brand-create" role="dialog" aria-modal="true" aria-labelledby="brand-create-title" hidden>
             <div class="modal-card"><button class="modal-close" type="button" data-modal-close aria-label="Close"><i class="fa-solid fa-xmark"></i></button><div class="modal-head"><span class="section-label">New brand</span><h2 id="brand-create-title">Add Brand</h2></div>
-                @include('frontend.inc.dashboard-brand-form', ['action' => route('dashboard.brands.store'), 'method' => null, 'brandRecord' => null])
+                @include('dashboard.inc.dashboard-brand-form', ['action' => route('dashboard.brands.store'), 'method' => null, 'brandRecord' => null])
             </div>
         </section>
 
         @foreach ($trustedBrands as $brand)
             <section class="dashboard-modal" id="brand-edit-{{ $brand->id }}" role="dialog" aria-modal="true" aria-labelledby="brand-edit-title-{{ $brand->id }}" hidden>
                 <div class="modal-card"><button class="modal-close" type="button" data-modal-close aria-label="Close"><i class="fa-solid fa-xmark"></i></button><div class="modal-head"><span class="section-label">Edit brand</span><h2 id="brand-edit-title-{{ $brand->id }}">{{ $brand->name }}</h2></div>
-                    @include('frontend.inc.dashboard-brand-form', ['action' => route('dashboard.brands.update', $brand), 'method' => 'PUT', 'brandRecord' => $brand])
+                    @include('dashboard.inc.dashboard-brand-form', ['action' => route('dashboard.brands.update', $brand), 'method' => 'PUT', 'brandRecord' => $brand])
                 </div>
             </section>
         @endforeach
 
         <section class="dashboard-modal" id="social-link-create" role="dialog" aria-modal="true" aria-labelledby="social-link-create-title" hidden>
             <div class="modal-card"><button class="modal-close" type="button" data-modal-close aria-label="Close"><i class="fa-solid fa-xmark"></i></button><div class="modal-head"><span class="section-label">New social link</span><h2 id="social-link-create-title">Add Social Link</h2></div>
-                @include('frontend.inc.dashboard-social-link-form', ['action' => route('dashboard.social-links.store'), 'method' => null, 'socialLinkRecord' => null])
+                @include('dashboard.inc.dashboard-social-link-form', ['action' => route('dashboard.social-links.store'), 'method' => null, 'socialLinkRecord' => null])
             </div>
         </section>
 
         @foreach ($socialLinks as $socialLink)
             <section class="dashboard-modal" id="social-link-edit-{{ $socialLink->id }}" role="dialog" aria-modal="true" aria-labelledby="social-link-edit-title-{{ $socialLink->id }}" hidden>
                 <div class="modal-card"><button class="modal-close" type="button" data-modal-close aria-label="Close"><i class="fa-solid fa-xmark"></i></button><div class="modal-head"><span class="section-label">Edit social link</span><h2 id="social-link-edit-title-{{ $socialLink->id }}">{{ $socialLink->label }}</h2></div>
-                    @include('frontend.inc.dashboard-social-link-form', ['action' => route('dashboard.social-links.update', $socialLink), 'method' => 'PUT', 'socialLinkRecord' => $socialLink])
+                    @include('dashboard.inc.dashboard-social-link-form', ['action' => route('dashboard.social-links.update', $socialLink), 'method' => 'PUT', 'socialLinkRecord' => $socialLink])
                 </div>
             </section>
         @endforeach
         <section class="dashboard-modal" id="user-create" role="dialog" aria-modal="true" aria-labelledby="user-create-title" hidden>
             <div class="modal-card"><button class="modal-close" type="button" data-modal-close aria-label="Close"><i class="fa-solid fa-xmark"></i></button><div class="modal-head"><span class="section-label">New user</span><h2 id="user-create-title">Add User</h2></div>
-                @include('frontend.inc.dashboard-user-form', ['action' => route('dashboard.users.store'), 'method' => null, 'userRecord' => null, 'roles' => $roles])
+                @include('dashboard.inc.dashboard-user-form', ['action' => route('dashboard.users.store'), 'method' => null, 'userRecord' => null, 'roles' => $roles])
             </div>
         </section>
 
         @foreach ($users as $user)
             <section class="dashboard-modal" id="user-edit-{{ $user->id }}" role="dialog" aria-modal="true" aria-labelledby="user-edit-title-{{ $user->id }}" hidden>
                 <div class="modal-card"><button class="modal-close" type="button" data-modal-close aria-label="Close"><i class="fa-solid fa-xmark"></i></button><div class="modal-head"><span class="section-label">Edit user</span><h2 id="user-edit-title-{{ $user->id }}">{{ $user->name }}</h2></div>
-                    @include('frontend.inc.dashboard-user-form', ['action' => route('dashboard.users.update', $user), 'method' => 'PUT', 'userRecord' => $user, 'roles' => $roles])
+                    @include('dashboard.inc.dashboard-user-form', ['action' => route('dashboard.users.update', $user), 'method' => 'PUT', 'userRecord' => $user, 'roles' => $roles])
                 </div>
             </section>
         @endforeach
@@ -418,6 +416,7 @@
     <script src="{{ url('frontend/assets/js/dashboard.js') }}"></script>
 </body>
 </html>
+
 
 
 
