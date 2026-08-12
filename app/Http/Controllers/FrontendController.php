@@ -2,17 +2,21 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\ContactAdminNotification;
+use App\Mail\ContactCustomerMessage;
 use App\Models\Campaign;
 use App\Models\ContactRequest;
 use App\Models\Review;
 use App\Models\Role;
 use App\Models\SiteSetting;
+use App\Models\SocialLink;
 use App\Models\TrustedBrand;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Validation\Rule;
 
 class FrontendController extends Controller
@@ -69,7 +73,7 @@ class FrontendController extends Controller
 
         $assignableRoles = $this->assignableRoles();
 
-        return view('frontend.dashboard', [
+        return view('dashboard.index', [
             'page' => $page,
             'users' => User::with('role')->latest()->get(),
             'campaigns' => $campaigns,
@@ -78,6 +82,7 @@ class FrontendController extends Controller
             'contactRequests' => ContactRequest::latest()->get(),
             'roles' => $assignableRoles,
             'siteSetting' => SiteSetting::current(),
+            'socialLinks' => SocialLink::ordered()->get(),
             'canManageUsers' => auth()->user()->canManageUsers(),
             'stats' => [
                 'budget' => $totalBudget,
@@ -99,7 +104,19 @@ class FrontendController extends Controller
             'message' => ['required', 'string', 'max:2000'],
         ]);
 
-        ContactRequest::create($validated);
+        $contactRequest = ContactRequest::create($validated);
+        $siteSetting = SiteSetting::current();
+        $adminEmails = $this->adminNotificationEmails($siteSetting);
+
+        try {
+            if ($adminEmails !== []) {
+                Mail::to($adminEmails)->send(new ContactAdminNotification($contactRequest, $siteSetting));
+            }
+
+            Mail::to($contactRequest->email)->send(new ContactCustomerMessage($contactRequest, $siteSetting));
+        } catch (\Throwable $exception) {
+            report($exception);
+        }
 
         return redirect()->route('contact-us')->with('contact_success', 'Thanks! Your message has been submitted.');
     }
@@ -274,6 +291,32 @@ class FrontendController extends Controller
 
         return redirect()->to(route('dashboard.page', 'brands'))->with('success', 'Trusted brand deleted successfully.');
     }
+    public function storeSocialLink(Request $request): RedirectResponse
+    {
+        $this->authorizeManagement();
+
+        SocialLink::create($this->socialLinkData($request));
+
+        return redirect()->to(route('dashboard.page', 'settings'))->with('success', 'Social link added successfully.');
+    }
+
+    public function updateSocialLink(Request $request, SocialLink $socialLink): RedirectResponse
+    {
+        $this->authorizeManagement();
+
+        $socialLink->update($this->socialLinkData($request));
+
+        return redirect()->to(route('dashboard.page', 'settings'))->with('success', 'Social link updated successfully.');
+    }
+
+    public function destroySocialLink(SocialLink $socialLink): RedirectResponse
+    {
+        $this->authorizeManagement();
+
+        $socialLink->delete();
+
+        return redirect()->to(route('dashboard.page', 'settings'))->with('success', 'Social link deleted successfully.');
+    }
     public function updateSettings(Request $request): RedirectResponse
     {
         $this->authorizeManagement();
@@ -281,6 +324,7 @@ class FrontendController extends Controller
         $validated = $request->validate([
             'phone' => ['nullable', 'string', 'max:50'],
             'email' => ['nullable', 'email', 'max:255'],
+            'admin_notification_emails' => ['nullable', 'string', 'max:2000'],
             'address' => ['nullable', 'string', 'max:1000'],
             'logo' => ['nullable', 'image', 'max:2048'],
             'transparent_logo' => ['nullable', 'image', 'max:2048'],
@@ -295,6 +339,7 @@ class FrontendController extends Controller
         $data = [
             'phone' => $validated['phone'] ?? null,
             'email' => $validated['email'] ?? null,
+            'admin_notification_emails' => $validated['admin_notification_emails'] ?? null,
             'address' => $validated['address'] ?? null,
             'linkedin_url' => $validated['linkedin_url'] ?? null,
             'instagram_url' => $validated['instagram_url'] ?? null,
@@ -323,6 +368,7 @@ class FrontendController extends Controller
         $rules = [
             'phone' => ['phone' => ['nullable', 'string', 'max:50']],
             'email' => ['email' => ['nullable', 'email', 'max:255']],
+            'admin_notification_emails' => ['admin_notification_emails' => ['nullable', 'string', 'max:2000']],
             'address' => ['address' => ['nullable', 'string', 'max:1000']],
             'linkedin_url' => ['linkedin_url' => ['nullable', 'url', 'max:255']],
             'instagram_url' => ['instagram_url' => ['nullable', 'url', 'max:255']],
@@ -340,6 +386,42 @@ class FrontendController extends Controller
         ]);
 
         return redirect()->to(route('dashboard.page', 'settings'))->with('success', str_replace('_', ' ', ucfirst($field)) . ' updated successfully.');
+    }
+
+
+    public function clearSettingField(string $field): RedirectResponse
+    {
+        $this->authorizeManagement();
+
+        $allowedFields = [
+            'phone',
+            'email',
+            'address',
+            'linkedin_url',
+            'instagram_url',
+            'facebook_url',
+            'x_url',
+            'youtube_url',
+        ];
+
+        abort_unless(in_array($field, $allowedFields, true), 404);
+
+        SiteSetting::current()->update([$field => null]);
+
+        return redirect()->to(route('dashboard.page', 'settings'))->with('success', str_replace('_', ' ', ucfirst($field)) . ' deleted successfully.');
+    }
+
+    public function clearSettingLogo(string $type): RedirectResponse
+    {
+        $this->authorizeManagement();
+
+        abort_unless(in_array($type, ['logo', 'transparent-logo'], true), 404);
+
+        $column = $type === 'logo' ? 'logo_path' : 'transparent_logo_path';
+
+        SiteSetting::current()->update([$column => null]);
+
+        return redirect()->to(route('dashboard.page', 'settings'))->with('success', ($type === 'logo' ? 'Logo' : 'Transparent logo') . ' deleted successfully.');
     }
 
     public function updateSettingLogo(Request $request, string $type): RedirectResponse
@@ -409,6 +491,30 @@ class FrontendController extends Controller
         return $validated;
     }
 
+    private function adminNotificationEmails(SiteSetting $siteSetting): array
+    {
+        return collect(explode(',', (string) $siteSetting->admin_notification_emails))
+            ->map(fn ($email) => trim($email))
+            ->filter(fn ($email) => filter_var($email, FILTER_VALIDATE_EMAIL))
+            ->unique()
+            ->values()
+            ->all();
+    }
+    private function socialLinkData(Request $request): array
+    {
+        $validated = $request->validate([
+            'label' => ['required', 'string', 'max:80'],
+            'url' => ['required', 'url', 'max:255'],
+            'icon_class' => ['required', 'string', 'max:80', 'regex:/^[a-z0-9-]+$/i'],
+            'sort_order' => ['nullable', 'integer', 'min:0', 'max:999999'],
+            'is_published' => ['nullable', 'boolean'],
+        ]);
+
+        $validated['sort_order'] = $validated['sort_order'] ?? 0;
+        $validated['is_published'] = $request->boolean('is_published');
+
+        return $validated;
+    }
     private function trustedBrandData(Request $request, ?TrustedBrand $brand = null): array
     {
         $validated = $request->validate([
@@ -465,6 +571,11 @@ class FrontendController extends Controller
         abort_unless(auth()->user()?->canManageUsers(), 403);
     }
 }
+
+
+
+
+
 
 
 

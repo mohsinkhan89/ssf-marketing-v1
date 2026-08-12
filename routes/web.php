@@ -40,7 +40,15 @@ Route::middleware('auth')->group(function () {
     Route::put('/dashboard/brands/{trustedBrand}', [FrontendController::class, 'updateTrustedBrand'])->name('dashboard.brands.update');
     Route::delete('/dashboard/brands/{trustedBrand}', [FrontendController::class, 'destroyTrustedBrand'])->name('dashboard.brands.destroy');
     Route::delete('/dashboard/contact-requests/{contactRequest}', [FrontendController::class, 'destroyContactRequest'])->name('dashboard.contact-requests.destroy');
+    Route::post('/dashboard/social-links', [FrontendController::class, 'storeSocialLink'])->name('dashboard.social-links.store');
+    Route::put('/dashboard/social-links/{socialLink}', [FrontendController::class, 'updateSocialLink'])->name('dashboard.social-links.update');
+    Route::delete('/dashboard/social-links/{socialLink}', [FrontendController::class, 'destroySocialLink'])->name('dashboard.social-links.destroy');
     Route::post('/dashboard/settings', [FrontendController::class, 'updateSettings'])->name('dashboard.settings.update');
     Route::post('/dashboard/settings/field/{field}', [FrontendController::class, 'updateSettingField'])->name('dashboard.settings.field.update');
+    Route::delete('/dashboard/settings/field/{field}', [FrontendController::class, 'clearSettingField'])->name('dashboard.settings.field.clear');
     Route::post('/dashboard/settings/logo/{type}', [FrontendController::class, 'updateSettingLogo'])->name('dashboard.settings.logo.update');
+    Route::delete('/dashboard/settings/logo/{type}', [FrontendController::class, 'clearSettingLogo'])->name('dashboard.settings.logo.clear');
 });
+
+
+

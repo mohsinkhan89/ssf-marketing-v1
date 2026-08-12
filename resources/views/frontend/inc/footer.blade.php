@@ -11,20 +11,10 @@
                   We turn ambitious business goals into focused digital
                   strategies, memorable creative and measurable growth.
                </p>
-               @php
-                  $socialLinks = [
-                     ['label' => 'LinkedIn', 'url' => $siteSetting?->linkedin_url, 'icon' => 'fa-linkedin-in'],
-                     ['label' => 'Instagram', 'url' => $siteSetting?->instagram_url, 'icon' => 'fa-instagram'],
-                     ['label' => 'Facebook', 'url' => $siteSetting?->facebook_url, 'icon' => 'fa-facebook-f'],
-                     ['label' => 'X', 'url' => $siteSetting?->x_url, 'icon' => 'fa-x-twitter'],
-                     ['label' => 'YouTube', 'url' => $siteSetting?->youtube_url, 'icon' => 'fa-youtube'],
-                  ];
-                  $visibleSocialLinks = collect($socialLinks)->filter(fn ($link) => filled($link['url']));
-               @endphp
-               @if ($visibleSocialLinks->isNotEmpty())
+               @if ($footerSocialLinks->isNotEmpty())
                   <div class="social-links">
-                     @foreach ($visibleSocialLinks as $link)
-                        <a href="{{ $link['url'] }}" target="_blank" rel="noopener" aria-label="{{ $link['label'] }}"><i class="fa-brands {{ $link['icon'] }}" aria-hidden="true"></i></a>
+                     @foreach ($footerSocialLinks as $socialLink)
+                        <a href="{{ $socialLink->url }}" target="_blank" rel="noopener" aria-label="{{ $socialLink->label }}"><i class="fa-brands {{ $socialLink->icon_class }}" aria-hidden="true"></i></a>
                      @endforeach
                   </div>
                @endif
@@ -67,5 +57,6 @@
             </div>
          </div>
       </footer>
+
 
 
