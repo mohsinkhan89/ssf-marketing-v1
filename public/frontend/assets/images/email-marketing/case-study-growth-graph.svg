@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 54" role="img" aria-label="Growth graph">
+  <defs>
+    <linearGradient id="bars" x1="0" y1="54" x2="0" y2="0">
+      <stop offset="0" stop-color="#0f6b8f" stop-opacity="0.05"/>
+      <stop offset="1" stop-color="#0f6b8f" stop-opacity="0.42"/>
+    </linearGradient>
+    <filter id="glow" x="-20%" y="-80%" width="140%" height="260%">
+      <feGaussianBlur stdDeviation="2.2" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  <g opacity="0.34" stroke="#ffffff" stroke-width="1">
+    <path d="M0 43.5H220"/>
+    <path d="M0 28.5H220" opacity="0.35"/>
+  </g>
+  <g fill="url(#bars)">
+    <rect x="8" y="36" width="10" height="16" rx="3"/>
+    <rect x="30" y="31" width="10" height="21" rx="3"/>
+    <rect x="52" y="34" width="10" height="18" rx="3"/>
+    <rect x="74" y="26" width="10" height="26" rx="3"/>
+    <rect x="96" y="29" width="10" height="23" rx="3"/>
+    <rect x="118" y="22" width="10" height="30" rx="3"/>
+    <rect x="140" y="18" width="10" height="34" rx="3"/>
+    <rect x="162" y="19" width="10" height="33" rx="3"/>
+    <rect x="184" y="12" width="10" height="40" rx="3"/>
+    <rect x="206" y="8" width="10" height="44" rx="3"/>
+  </g>
+  <path d="M12 38 L36 32 L58 35 L80 27 L102 31 L124 22 L146 18 L168 20 L190 13 L212 8" fill="none" stroke="#0f6b8f" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" filter="url(#glow)"/>
+  <g fill="#0f6b8f" filter="url(#glow)">
+    <circle cx="12" cy="38" r="3"/>
+    <circle cx="36" cy="32" r="3"/>
+    <circle cx="58" cy="35" r="3"/>
+    <circle cx="80" cy="27" r="3"/>
+    <circle cx="102" cy="31" r="3"/>
+    <circle cx="124" cy="22" r="3"/>
+    <circle cx="146" cy="18" r="3"/>
+    <circle cx="168" cy="20" r="3"/>
+    <circle cx="190" cy="13" r="3"/>
+    <circle cx="212" cy="8" r="3"/>
+  </g>
+</svg>
