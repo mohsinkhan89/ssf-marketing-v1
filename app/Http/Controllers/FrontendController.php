@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\ContactAdminNotification;
+use App\Mail\ContactCustomerMessage;
 use App\Models\Campaign;
 use App\Models\ContactRequest;
 use App\Models\Review;
@@ -14,6 +16,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Validation\Rule;
 
 class FrontendController extends Controller
@@ -101,7 +104,19 @@ class FrontendController extends Controller
             'message' => ['required', 'string', 'max:2000'],
         ]);
 
-        ContactRequest::create($validated);
+        $contactRequest = ContactRequest::create($validated);
+        $siteSetting = SiteSetting::current();
+        $adminEmails = $this->adminNotificationEmails($siteSetting);
+
+        try {
+            if ($adminEmails !== []) {
+                Mail::to($adminEmails)->send(new ContactAdminNotification($contactRequest, $siteSetting));
+            }
+
+            Mail::to($contactRequest->email)->send(new ContactCustomerMessage($contactRequest, $siteSetting));
+        } catch (\Throwable $exception) {
+            report($exception);
+        }
 
         return redirect()->route('contact-us')->with('contact_success', 'Thanks! Your message has been submitted.');
     }
@@ -309,6 +324,7 @@ class FrontendController extends Controller
         $validated = $request->validate([
             'phone' => ['nullable', 'string', 'max:50'],
             'email' => ['nullable', 'email', 'max:255'],
+            'admin_notification_emails' => ['nullable', 'string', 'max:2000'],
             'address' => ['nullable', 'string', 'max:1000'],
             'logo' => ['nullable', 'image', 'max:2048'],
             'transparent_logo' => ['nullable', 'image', 'max:2048'],
@@ -323,6 +339,7 @@ class FrontendController extends Controller
         $data = [
             'phone' => $validated['phone'] ?? null,
             'email' => $validated['email'] ?? null,
+            'admin_notification_emails' => $validated['admin_notification_emails'] ?? null,
             'address' => $validated['address'] ?? null,
             'linkedin_url' => $validated['linkedin_url'] ?? null,
             'instagram_url' => $validated['instagram_url'] ?? null,
@@ -351,6 +368,7 @@ class FrontendController extends Controller
         $rules = [
             'phone' => ['phone' => ['nullable', 'string', 'max:50']],
             'email' => ['email' => ['nullable', 'email', 'max:255']],
+            'admin_notification_emails' => ['admin_notification_emails' => ['nullable', 'string', 'max:2000']],
             'address' => ['address' => ['nullable', 'string', 'max:1000']],
             'linkedin_url' => ['linkedin_url' => ['nullable', 'url', 'max:255']],
             'instagram_url' => ['instagram_url' => ['nullable', 'url', 'max:255']],
@@ -473,6 +491,15 @@ class FrontendController extends Controller
         return $validated;
     }
 
+    private function adminNotificationEmails(SiteSetting $siteSetting): array
+    {
+        return collect(explode(',', (string) $siteSetting->admin_notification_emails))
+            ->map(fn ($email) => trim($email))
+            ->filter(fn ($email) => filter_var($email, FILTER_VALIDATE_EMAIL))
+            ->unique()
+            ->values()
+            ->all();
+    }
     private function socialLinkData(Request $request): array
     {
         $validated = $request->validate([
@@ -544,6 +571,8 @@ class FrontendController extends Controller
         abort_unless(auth()->user()?->canManageUsers(), 403);
     }
 }
+
+
 
 
 

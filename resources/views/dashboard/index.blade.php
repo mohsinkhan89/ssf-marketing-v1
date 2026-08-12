@@ -270,6 +270,7 @@
                                 <label><span>Phone</span><input type="text" name="phone" value="{{ old('phone', $siteSetting->phone) }}" placeholder="+44 7123 456789" inputmode="tel" maxlength="15" data-phone-mask="uk" @disabled(! $canManageUsers)></label>
                                 <label><span>Email</span><input type="email" name="email" value="{{ old('email', $siteSetting->email) }}" placeholder="hello@ssfmarketing.com" @disabled(! $canManageUsers)></label>
                                 <label class="full-span"><span>Address</span><textarea name="address" rows="3" placeholder="Your office address" @disabled(! $canManageUsers)>{{ old('address', $siteSetting->address) }}</textarea></label>
+                                <label class="full-span"><span>Admin notification emails</span><textarea name="admin_notification_emails" rows="2" placeholder="admin@example.com, sales@example.com" @disabled(! $canManageUsers)>{{ old('admin_notification_emails', $siteSetting->admin_notification_emails) }}</textarea></label>
                                 @if ($canManageUsers)<button class="primary-action form-submit full-span" type="submit"><i class="fa-solid fa-floppy-disk"></i><span>Save contact info</span></button>@endif
                             </form>
                         </article>
@@ -320,10 +321,8 @@
                         </article>
                     </section>
                 @endif
-                                </div>
             </section>
         </main>
-    </div>
 
     <div class="modal-backdrop" data-modal-backdrop hidden></div>
 

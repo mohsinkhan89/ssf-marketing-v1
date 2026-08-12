@@ -12,6 +12,7 @@ class SiteSetting extends Model
     protected $fillable = [
         'phone',
         'email',
+        'admin_notification_emails',
         'address',
         'logo_path',
         'transparent_logo_path',
@@ -32,3 +33,4 @@ class SiteSetting extends Model
         ]);
     }
 }
+
