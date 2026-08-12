@@ -263,108 +263,66 @@
                         @endforeach
                     </section>
                 @elseif ($page === 'settings')
-                    <section class="page-head"><div><span class="section-label">Settings</span><h2>Workspace Settings</h2><p>Contact information, social links, and logos are grouped here. Save to add/update, or delete to hide from the website.</p></div></section>
-                    <section class="settings-box-grid">
-                        <article class="dashboard-panel settings-box">
-                            <div class="settings-box-head"><div><span class="section-label">Contact</span><h2>Contact Information</h2></div><mark class="access-badge">{{ $canManageUsers ? 'Editable' : 'View only' }}</mark></div>
-                            <div class="settings-row-list">
-                                <div class="settings-row-item">
-                                    <div class="setting-icon"><i class="fa-solid fa-phone"></i></div>
-                                    <form class="dashboard-form setting-inline-form" method="POST" action="{{ route('dashboard.settings.field.update', 'phone') }}">
-                                        @csrf
-                                        <label><span>Phone number</span><input type="text" name="phone" value="{{ old('phone', $siteSetting->phone) }}" placeholder="+44 7123 456789" inputmode="tel" maxlength="15" data-phone-mask="uk" @disabled(! $canManageUsers)></label>
-                                        @if ($canManageUsers)<button class="primary-action" type="submit" aria-label="Save phone"><i class="fa-solid fa-floppy-disk"></i></button>@endif
-                                    </form>
-                                    @if ($canManageUsers && $siteSetting->phone)
-                                        <form method="POST" action="{{ route('dashboard.settings.field.clear', 'phone') }}">@csrf @method('DELETE')<button class="danger-button" type="submit" data-confirm-delete aria-label="Delete phone"><i class="fa-solid fa-trash"></i></button></form>
-                                    @endif
-                                </div>
-                                <div class="settings-row-item">
-                                    <div class="setting-icon"><i class="fa-solid fa-envelope"></i></div>
-                                    <form class="dashboard-form setting-inline-form" method="POST" action="{{ route('dashboard.settings.field.update', 'email') }}">
-                                        @csrf
-                                        <label><span>Email address</span><input type="email" name="email" value="{{ old('email', $siteSetting->email) }}" placeholder="hello@ssfmarketing.com" @disabled(! $canManageUsers)></label>
-                                        @if ($canManageUsers)<button class="primary-action" type="submit" aria-label="Save email"><i class="fa-solid fa-floppy-disk"></i></button>@endif
-                                    </form>
-                                    @if ($canManageUsers && $siteSetting->email)
-                                        <form method="POST" action="{{ route('dashboard.settings.field.clear', 'email') }}">@csrf @method('DELETE')<button class="danger-button" type="submit" data-confirm-delete aria-label="Delete email"><i class="fa-solid fa-trash"></i></button></form>
-                                    @endif
-                                </div>
-                                <div class="settings-row-item align-start">
-                                    <div class="setting-icon"><i class="fa-solid fa-location-dot"></i></div>
-                                    <form class="dashboard-form setting-inline-form" method="POST" action="{{ route('dashboard.settings.field.update', 'address') }}">
-                                        @csrf
-                                        <label><span>Office address</span><textarea name="address" rows="3" placeholder="Your office address" @disabled(! $canManageUsers)>{{ old('address', $siteSetting->address) }}</textarea></label>
-                                        @if ($canManageUsers)<button class="primary-action" type="submit" aria-label="Save address"><i class="fa-solid fa-floppy-disk"></i></button>@endif
-                                    </form>
-                                    @if ($canManageUsers && $siteSetting->address)
-                                        <form method="POST" action="{{ route('dashboard.settings.field.clear', 'address') }}">@csrf @method('DELETE')<button class="danger-button" type="submit" data-confirm-delete aria-label="Delete address"><i class="fa-solid fa-trash"></i></button></form>
-                                    @endif
-                                </div>
-                            </div>
+                    <section class="page-head compact-settings-head"><div><span class="section-label">Settings</span><h2>Website Settings</h2><p>Compact controls for contact details, footer social icons, and brand logos.</p></div></section>
+                    <section class="settings-compact-grid">
+                        <article class="dashboard-panel compact-settings-card contact-card">
+                            <div class="compact-card-head"><div><span class="section-label">Contact</span><h2>Contact Information</h2></div></div>
+                            <form class="dashboard-form compact-contact-form" method="POST" action="{{ route('dashboard.settings.update') }}" enctype="multipart/form-data">
+                                @csrf
+                                <label><span>Phone</span><input type="text" name="phone" value="{{ old('phone', $siteSetting->phone) }}" placeholder="+44 7123 456789" inputmode="tel" maxlength="15" data-phone-mask="uk" @disabled(! $canManageUsers)></label>
+                                <label><span>Email</span><input type="email" name="email" value="{{ old('email', $siteSetting->email) }}" placeholder="hello@ssfmarketing.com" @disabled(! $canManageUsers)></label>
+                                <label class="full-span"><span>Address</span><textarea name="address" rows="3" placeholder="Your office address" @disabled(! $canManageUsers)>{{ old('address', $siteSetting->address) }}</textarea></label>
+                                @if ($canManageUsers)<button class="primary-action form-submit full-span" type="submit"><i class="fa-solid fa-floppy-disk"></i><span>Save contact info</span></button>@endif
+                            </form>
                         </article>
 
-                        <article class="dashboard-panel settings-box">
-                            <div class="settings-box-head"><div><span class="section-label">Social</span><h2>Social Media Links</h2></div><mark class="access-badge">Footer icons</mark></div>
-                            <div class="settings-row-list">
-                                @php
-                                    $socialSettingRows = [
-                                        ['field' => 'linkedin_url', 'label' => 'LinkedIn URL', 'icon' => 'fa-linkedin-in', 'placeholder' => 'https://linkedin.com/company/your-brand'],
-                                        ['field' => 'instagram_url', 'label' => 'Instagram URL', 'icon' => 'fa-instagram', 'placeholder' => 'https://instagram.com/your-brand'],
-                                        ['field' => 'facebook_url', 'label' => 'Facebook URL', 'icon' => 'fa-facebook-f', 'placeholder' => 'https://facebook.com/your-brand'],
-                                        ['field' => 'x_url', 'label' => 'X URL', 'icon' => 'fa-x-twitter', 'placeholder' => 'https://x.com/your-brand'],
-                                        ['field' => 'youtube_url', 'label' => 'YouTube URL', 'icon' => 'fa-youtube', 'placeholder' => 'https://youtube.com/@your-brand'],
-                                    ];
-                                @endphp
-                                @foreach ($socialSettingRows as $socialRow)
-                                    @php $socialValue = $siteSetting->{$socialRow['field']}; @endphp
-                                    <div class="settings-row-item">
-                                        <div class="setting-icon"><i class="fa-brands {{ $socialRow['icon'] }}"></i></div>
-                                        <form class="dashboard-form setting-inline-form" method="POST" action="{{ route('dashboard.settings.field.update', $socialRow['field']) }}">
-                                            @csrf
-                                            <label><span>{{ $socialRow['label'] }}</span><input type="url" name="{{ $socialRow['field'] }}" value="{{ old($socialRow['field'], $socialValue) }}" placeholder="{{ $socialRow['placeholder'] }}" @disabled(! $canManageUsers)></label>
-                                            @if ($canManageUsers)<button class="primary-action" type="submit" aria-label="Save {{ $socialRow['label'] }}"><i class="fa-solid fa-floppy-disk"></i></button>@endif
-                                        </form>
-                                        @if ($canManageUsers && $socialValue)
-                                            <form method="POST" action="{{ route('dashboard.settings.field.clear', $socialRow['field']) }}">@csrf @method('DELETE')<button class="danger-button" type="submit" data-confirm-delete aria-label="Delete {{ $socialRow['label'] }}"><i class="fa-solid fa-trash"></i></button></form>
+                        <article class="dashboard-panel compact-settings-card social-card">
+                            <div class="compact-card-head"><div><span class="section-label">Social</span><h2>Social Media Icons</h2></div>@if ($canManageUsers)<button class="primary-action compact-add-btn" type="button" data-modal-open="social-link-create"><i class="fa-solid fa-plus"></i><span>Add</span></button>@endif</div>
+                            <div class="social-link-list">
+                                @forelse ($socialLinks as $socialLink)
+                                    <div class="social-link-item">
+                                        <span class="social-link-icon"><i class="fa-brands {{ $socialLink->icon_class }}"></i></span>
+                                        <div><strong>{{ $socialLink->label }}</strong><small>{{ $socialLink->url }}</small></div>
+                                        <mark class="status {{ $socialLink->is_published ? 'live' : 'paused' }}">{{ $socialLink->is_published ? 'Show' : 'Hide' }}</mark>
+                                        @if ($canManageUsers)
+                                            <div class="row-actions">
+                                                <button class="icon-action" type="button" data-modal-open="social-link-edit-{{ $socialLink->id }}" aria-label="Edit {{ $socialLink->label }}"><i class="fa-solid fa-pen"></i></button>
+                                                <form method="POST" action="{{ route('dashboard.social-links.destroy', $socialLink) }}">@csrf @method('DELETE')<button class="danger-button" type="submit" data-confirm-delete aria-label="Delete {{ $socialLink->label }}"><i class="fa-solid fa-trash"></i></button></form>
+                                            </div>
                                         @endif
                                     </div>
-                                @endforeach
+                                @empty
+                                    <div class="empty-state-line"><i class="fa-solid fa-link"></i><span>No social links added yet.</span></div>
+                                @endforelse
                             </div>
                         </article>
 
-                        <article class="dashboard-panel settings-box logos-box">
-                            <div class="settings-box-head"><div><span class="section-label">Branding</span><h2>Website Logos</h2></div><mark class="access-badge">Upload images</mark></div>
-                            <div class="logo-settings-grid">
-                                <div class="logo-setting-unit">
-                                    <div class="field-card-head"><div class="setting-icon"><i class="fa-solid fa-image"></i></div><div><span class="section-label">Logo</span><h3>Main logo</h3></div></div>
-                                    <div class="logo-preview light-preview">@if ($siteSetting->logo_path)<img src="{{ url($siteSetting->logo_path) }}" alt="Main logo preview">@else<strong>No logo added</strong>@endif</div>
-                                    <form class="dashboard-form logo-action-form" method="POST" action="{{ route('dashboard.settings.logo.update', 'logo') }}" enctype="multipart/form-data">
+                        <article class="dashboard-panel compact-settings-card logos-card">
+                            <div class="compact-card-head"><div><span class="section-label">Branding</span><h2>Logo Manager</h2></div></div>
+                            <div class="compact-logo-grid">
+                                <div class="compact-logo-unit">
+                                    <div class="logo-preview light-preview">@if ($siteSetting->logo_path)<img src="{{ url($siteSetting->logo_path) }}" alt="Main logo preview">@else<strong>No main logo</strong>@endif</div>
+                                    <form class="dashboard-form compact-logo-form" method="POST" action="{{ route('dashboard.settings.logo.update', 'logo') }}" enctype="multipart/form-data">
                                         @csrf
-                                        <input type="file" name="logo" accept="image/*" @disabled(! $canManageUsers)>
-                                        @if ($canManageUsers)<button class="primary-action" type="submit"><i class="fa-solid fa-upload"></i><span>{{ $siteSetting->logo_path ? 'Update logo' : 'Add logo' }}</span></button>@endif
+                                        <label><span>Main logo</span><input type="file" name="logo" accept="image/*" @disabled(! $canManageUsers)></label>
+                                        @if ($canManageUsers)<button class="primary-action" type="submit"><i class="fa-solid fa-upload"></i></button>@endif
                                     </form>
-                                    @if ($canManageUsers && $siteSetting->logo_path)
-                                        <form method="POST" action="{{ route('dashboard.settings.logo.clear', 'logo') }}">@csrf @method('DELETE')<button class="danger-button text-danger-button" type="submit" data-confirm-delete><i class="fa-solid fa-trash"></i><span>Delete logo</span></button></form>
-                                    @endif
+                                    @if ($canManageUsers && $siteSetting->logo_path)<form method="POST" action="{{ route('dashboard.settings.logo.clear', 'logo') }}">@csrf @method('DELETE')<button class="danger-button text-danger-button" type="submit" data-confirm-delete><i class="fa-solid fa-trash"></i><span>Delete main logo</span></button></form>@endif
                                 </div>
-
-                                <div class="logo-setting-unit dark-card">
-                                    <div class="field-card-head"><div class="setting-icon"><i class="fa-regular fa-image"></i></div><div><span class="section-label">Transparent</span><h3>Transparent logo</h3></div></div>
-                                    <div class="logo-preview dark-preview">@if ($siteSetting->transparent_logo_path)<img src="{{ url($siteSetting->transparent_logo_path) }}" alt="Transparent logo preview">@else<strong>No transparent logo added</strong>@endif</div>
-                                    <form class="dashboard-form logo-action-form" method="POST" action="{{ route('dashboard.settings.logo.update', 'transparent-logo') }}" enctype="multipart/form-data">
+                                <div class="compact-logo-unit dark-card">
+                                    <div class="logo-preview dark-preview">@if ($siteSetting->transparent_logo_path)<img src="{{ url($siteSetting->transparent_logo_path) }}" alt="Transparent logo preview">@else<strong>No transparent logo</strong>@endif</div>
+                                    <form class="dashboard-form compact-logo-form" method="POST" action="{{ route('dashboard.settings.logo.update', 'transparent-logo') }}" enctype="multipart/form-data">
                                         @csrf
-                                        <input type="file" name="transparent_logo" accept="image/*" @disabled(! $canManageUsers)>
-                                        @if ($canManageUsers)<button class="primary-action" type="submit"><i class="fa-solid fa-upload"></i><span>{{ $siteSetting->transparent_logo_path ? 'Update transparent logo' : 'Add transparent logo' }}</span></button>@endif
+                                        <label><span>Transparent logo</span><input type="file" name="transparent_logo" accept="image/*" @disabled(! $canManageUsers)></label>
+                                        @if ($canManageUsers)<button class="primary-action" type="submit"><i class="fa-solid fa-upload"></i></button>@endif
                                     </form>
-                                    @if ($canManageUsers && $siteSetting->transparent_logo_path)
-                                        <form method="POST" action="{{ route('dashboard.settings.logo.clear', 'transparent-logo') }}">@csrf @method('DELETE')<button class="danger-button text-danger-button" type="submit" data-confirm-delete><i class="fa-solid fa-trash"></i><span>Delete transparent logo</span></button></form>
-                                    @endif
+                                    @if ($canManageUsers && $siteSetting->transparent_logo_path)<form method="POST" action="{{ route('dashboard.settings.logo.clear', 'transparent-logo') }}">@csrf @method('DELETE')<button class="danger-button text-danger-button" type="submit" data-confirm-delete><i class="fa-solid fa-trash"></i><span>Delete transparent logo</span></button></form>@endif
                                 </div>
                             </div>
                         </article>
                     </section>
                 @endif
+                                </div>
             </section>
         </main>
     </div>
@@ -428,6 +386,20 @@
                 </div>
             </section>
         @endforeach
+
+        <section class="dashboard-modal" id="social-link-create" role="dialog" aria-modal="true" aria-labelledby="social-link-create-title" hidden>
+            <div class="modal-card"><button class="modal-close" type="button" data-modal-close aria-label="Close"><i class="fa-solid fa-xmark"></i></button><div class="modal-head"><span class="section-label">New social link</span><h2 id="social-link-create-title">Add Social Link</h2></div>
+                @include('frontend.inc.dashboard-social-link-form', ['action' => route('dashboard.social-links.store'), 'method' => null, 'socialLinkRecord' => null])
+            </div>
+        </section>
+
+        @foreach ($socialLinks as $socialLink)
+            <section class="dashboard-modal" id="social-link-edit-{{ $socialLink->id }}" role="dialog" aria-modal="true" aria-labelledby="social-link-edit-title-{{ $socialLink->id }}" hidden>
+                <div class="modal-card"><button class="modal-close" type="button" data-modal-close aria-label="Close"><i class="fa-solid fa-xmark"></i></button><div class="modal-head"><span class="section-label">Edit social link</span><h2 id="social-link-edit-title-{{ $socialLink->id }}">{{ $socialLink->label }}</h2></div>
+                    @include('frontend.inc.dashboard-social-link-form', ['action' => route('dashboard.social-links.update', $socialLink), 'method' => 'PUT', 'socialLinkRecord' => $socialLink])
+                </div>
+            </section>
+        @endforeach
         <section class="dashboard-modal" id="user-create" role="dialog" aria-modal="true" aria-labelledby="user-create-title" hidden>
             <div class="modal-card"><button class="modal-close" type="button" data-modal-close aria-label="Close"><i class="fa-solid fa-xmark"></i></button><div class="modal-head"><span class="section-label">New user</span><h2 id="user-create-title">Add User</h2></div>
                 @include('frontend.inc.dashboard-user-form', ['action' => route('dashboard.users.store'), 'method' => null, 'userRecord' => null, 'roles' => $roles])
@@ -446,6 +418,7 @@
     <script src="{{ url('frontend/assets/js/dashboard.js') }}"></script>
 </body>
 </html>
+
 
 
 
