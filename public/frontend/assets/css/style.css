@@ -3974,22 +3974,7 @@ em {
 .contact-form button {
   min-height: 46px
 }
-
-.form-success {
-  display: none;
-  margin-top: 15px;
-  padding: 11px;
-  border-radius: 9px;
-  background: rgba(54, 217, 137, .1);
-  color: #168951;
-  font-size: .65rem;
-  font-weight: 800
-}
-
-.contact-form.sent .form-success {
-  display: block
-}
-
+
 .location-section {
   padding: 72px 0;
   background: #052f41;
@@ -9539,4 +9524,39 @@ body {
     font-size: 1rem;
     line-height: 1.8
   }
+}
+
+.form-alert {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  overflow: hidden;
+  max-height: 120px;
+  margin-bottom: 18px;
+  border: 1px solid rgba(15,107,143,.18);
+  border-radius: 8px;
+  background: #ffffff;
+  padding: 13px 14px;
+  color: #0f6b8f;
+  font-size: .92rem;
+  font-weight: 800;
+  box-shadow: 0 16px 34px rgba(10,14,22,.08);
+  opacity: 1;
+  transform: translateY(0);
+  transition: max-height .34s ease, margin .34s ease, padding .34s ease, opacity .24s ease, transform .34s ease;
+}
+
+.form-alert.error {
+  border-color: rgba(217,75,75,.28);
+  color: #d94b4b;
+}
+
+.form-alert.is-hiding {
+  max-height: 0;
+  margin-top: 0;
+  margin-bottom: 0;
+  padding-top: 0;
+  padding-bottom: 0;
+  opacity: 0;
+  transform: translateY(-10px);
 }

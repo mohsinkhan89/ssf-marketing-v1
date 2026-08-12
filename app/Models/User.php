@@ -22,6 +22,7 @@ class User extends Authenticatable
         'role_id',
         'name',
         'email',
+        'phone',
         'password',
     ];
 
@@ -61,5 +62,15 @@ class User extends Authenticatable
     public function isSuperAdmin(): bool
     {
         return $this->hasRole('super-admin');
+    }
+
+    public function isAdmin(): bool
+    {
+        return $this->hasRole('admin');
+    }
+
+    public function canManageUsers(): bool
+    {
+        return $this->isSuperAdmin() || $this->isAdmin();
     }
 }

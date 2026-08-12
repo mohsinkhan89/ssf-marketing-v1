@@ -122,42 +122,21 @@ Home - Markit Digital Marketing
             <div class="logo-slider">
                 <div class="logo-viewport">
                     <div class="logos">
-                    <div class="logo-slide">
-                        <img
-                            src="{{ url('frontend/assets/images/trusted-business/trusted-logo-ziply.png') }}"
-                            alt="Ziply"
-                        />
-                    </div>
-                    <div class="logo-slide">
-                        <img
-                            src="{{ url('frontend/assets/images/trusted-business/trusted-logo-wave.png') }}"
-                            alt="Wave"
-                        />
-                    </div>
-                    <div class="logo-slide">
-                        <img
-                            src="{{ url('frontend/assets/images/trusted-business/trusted-logo-kanba.png') }}"
-                            alt="Kanba"
-                        />
-                    </div>
-                    <div class="logo-slide">
-                        <img
-                            src="{{ url('frontend/assets/images/trusted-business/trusted-logo-holler.png') }}"
-                            alt="Holler"
-                        />
-                    </div>
-                    <div class="logo-slide">
-                        <img
-                            src="{{ url('frontend/assets/images/trusted-business/trusted-logo-zanda.png') }}"
-                            alt="Zanda"
-                        />
-                    </div>
-                    <div class="logo-slide">
-                        <img
-                            src="{{ url('frontend/assets/images/trusted-business/trusted-logo-solvixa.png') }}"
-                            alt="Solvixa"
-                        />
-                    </div>
+                        @forelse ($trustedBrands as $brand)
+                            <div class="logo-slide">
+                                @if ($brand->website_url)
+                                    <a href="{{ $brand->website_url }}" target="_blank" rel="noopener" aria-label="Open {{ $brand->name }} website">
+                                        <img src="{{ url($brand->logo_path) }}" alt="{{ $brand->name }}">
+                                    </a>
+                                @else
+                                    <img src="{{ url($brand->logo_path) }}" alt="{{ $brand->name }}">
+                                @endif
+                            </div>
+                        @empty
+                            <div class="logo-slide">
+                                <img src="{{ url('frontend/assets/images/trusted-business/trusted-logo-ziply.png') }}" alt="Ziply">
+                            </div>
+                        @endforelse
                     </div>
                 </div>
                 <div
@@ -495,20 +474,28 @@ Home - Markit Digital Marketing
                     </button>
                 </div>
             </div>
-            <div class="testimonial-card reveal" id="testimonial">
-                <div class="quote-mark">“</div>
-                <div class="stars">★★★★★</div>
-                <blockquote>
-                    Markit transformed our online presence and accelerated our
-                    marketing results. Our leads rose, and sales have never
-                    been better.
-                </blockquote>
-                <div class="client">
-                    <span>JD</span>
-                    <div>
-                    <b>John Davis</b><small>CEO, TechSolutions</small>
-                    </div>
-                </div>
+            @php
+                $testimonialItems = $reviews->map(fn ($review) => [
+                    'quote' => $review->quote,
+                    'initials' => $review->initials,
+                    'name' => $review->client_name,
+                    'role' => $review->client_role,
+                    'rating' => $review->rating,
+                ])->values();
+                $firstReview = $reviews->first();
+            @endphp
+            <div class="testimonial-card reveal" id="testimonial" data-testimonials='@json($testimonialItems, JSON_HEX_APOS | JSON_HEX_QUOT)'>
+                @if ($firstReview)
+                    <div class="quote-mark">“</div>
+                    <div class="stars">@for ($star = 0; $star < $firstReview->rating; $star++)<i class="fa-solid fa-star"></i>@endfor</div>
+                    <blockquote>{{ $firstReview->quote }}</blockquote>
+                    <div class="client"><span>{{ $firstReview->initials }}</span><div><b>{{ $firstReview->client_name }}</b><small>{{ $firstReview->client_role }}</small></div></div>
+                @else
+                    <div class="quote-mark">“</div>
+                    <div class="stars"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i></div>
+                    <blockquote>No reviews added yet.</blockquote>
+                    <div class="client"><span>SS</span><div><b>SSF Marketing</b><small>Client stories</small></div></div>
+                @endif
             </div>
         </div>
         </section>
@@ -618,3 +605,5 @@ Home - Markit Digital Marketing
 
 @section('js')
 @endsection
+
+

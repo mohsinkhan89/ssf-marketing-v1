@@ -7,207 +7,450 @@
     <title>Dashboard - SSF Marketing</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <link rel="stylesheet" href="{{ url('frontend/assets/css/dashboard.css') }}">
 </head>
 <body>
-    <div class="app-shell">
-        <aside class="sidebar" aria-label="Dashboard navigation">
-            <a class="brand-panel" href="{{ route('home') }}" aria-label="SSF Marketing home">
+    @php
+        $statusLabels = ['planned' => 'Planned', 'live' => 'Live', 'review' => 'Review', 'paused' => 'Paused'];
+        $navItems = [
+            'campaigns' => ['label' => 'Campaigns', 'icon' => 'fa-bullhorn', 'url' => route('dashboard.page', 'campaigns')],
+            'users' => ['label' => 'Users', 'icon' => 'fa-users', 'url' => route('dashboard.page', 'users')],
+            'reviews' => ['label' => 'Reviews', 'icon' => 'fa-star', 'url' => route('dashboard.page', 'reviews')],
+            'brands' => ['label' => 'Brands', 'icon' => 'fa-building', 'url' => route('dashboard.page', 'brands')],
+            'contacts' => ['label' => 'Contacts', 'icon' => 'fa-inbox', 'url' => route('dashboard.page', 'contacts')],
+            'reports' => ['label' => 'Reports', 'icon' => 'fa-chart-simple', 'url' => route('dashboard.page', 'reports')],
+            'settings' => ['label' => 'Settings', 'icon' => 'fa-gear', 'url' => route('dashboard.page', 'settings')],
+        ];
+    @endphp
+
+    <div class="dashboard-shell">
+        <aside class="dashboard-sidebar" aria-label="Dashboard navigation">
+            <a class="dashboard-brand" href="{{ route('home') }}" aria-label="SSF Marketing home">
                 <img src="{{ url('frontend/assets/images/logo/logo.png') }}" alt="SSF Marketing">
-                <span>SSF</span>
+                <span>SSF Marketing</span>
             </a>
 
-            <nav class="side-nav">
-                <a class="active" href="{{ route('dashboard') }}"><i class="fa-solid fa-chart-pie"></i><span>Dashboard</span></a>
-                <a href="#campaigns"><i class="fa-solid fa-bullhorn"></i><span>Campaigns</span></a>
-                <a href="#channels"><i class="fa-solid fa-layer-group"></i><span>Channels</span></a>
-                <a href="#tasks"><i class="fa-solid fa-list-check"></i><span>Tasks</span></a>
+            <nav class="dashboard-nav">
+                @foreach ($navItems as $key => $item)
+                    <a class="{{ $page === $key ? 'active' : '' }}" href="{{ $item['url'] }}"><i class="fa-solid {{ $item['icon'] }}"></i><span>{{ $item['label'] }}</span></a>
+                @endforeach
                 <a href="{{ route('home') }}"><i class="fa-solid fa-globe"></i><span>Website</span></a>
             </nav>
 
-            <div class="side-card">
-                <span>Monthly target</span>
-                <strong>82%</strong>
-                <div class="progress-track"><span style="width: 82%"></span></div>
-                <small>$148k of $180k pipeline booked</small>
+            <div class="sidebar-summary">
+                <span>Workspace</span>
+                <strong>{{ ucfirst($page) }}</strong>
+                <div class="progress-line" aria-hidden="true"><i style="width: 82%"></i></div>
+                <small>{{ $canManageUsers ? 'Admin controls enabled' : 'Readonly access' }}</small>
             </div>
         </aside>
 
         <main class="dashboard-main">
-            <header class="topbar">
-                <div>
-                    <span class="eyebrow">{{ auth()->user()->role?->name ?? 'Team' }} dashboard</span>
-                    <h1>Marketing Dashboard</h1>
+            <header class="dashboard-topbar">
+                <div class="topbar-title">
+                    <span>{{ auth()->user()->role?->name ?? 'Team' }} dashboard</span>
+                    <h1>{{ $navItems[$page]['label'] ?? 'Dashboard' }}</h1>
                 </div>
-                <div class="top-actions">
-                    <button type="button" aria-label="Search"><i class="fa-solid fa-magnifying-glass"></i></button>
-                    <button type="button" aria-label="Notifications"><i class="fa-regular fa-bell"></i><span></span></button>
-                                        <a class="profile-chip" href="#tasks"><span>{{ strtoupper(substr(auth()->user()->name, 0, 1)) }}</span><strong>{{ auth()->user()->name }}</strong></a>
-                    <form class="logout-form" method="POST" action="{{ route('logout') }}">
-                        @csrf
-                        <button type="submit" aria-label="Logout"><i class="fa-solid fa-arrow-right-from-bracket"></i></button>
-                    </form>
+
+                <div class="topbar-actions">
+                    <a class="icon-button" href="{{ route('home') }}" aria-label="Open website" title="Open website"><i class="fa-solid fa-arrow-up-right-from-square"></i></a>
+                    <button class="icon-button has-dot" type="button" aria-label="Notifications" title="Notifications"><i class="fa-regular fa-bell"></i></button>
+                    <div class="profile-menu">
+                        <button class="user-chip profile-trigger" type="button" aria-haspopup="true" aria-expanded="false">
+                            <span>{{ strtoupper(substr(auth()->user()->name, 0, 1)) }}</span>
+                            <strong>{{ auth()->user()->name }}</strong>
+                            <i class="fa-solid fa-chevron-down"></i>
+                        </button>
+                        <div class="profile-dropdown" role="menu">
+                            <div class="profile-dropdown-head">
+                                <span>{{ strtoupper(substr(auth()->user()->name, 0, 1)) }}</span>
+                                <div><strong>{{ auth()->user()->name }}</strong><small>{{ auth()->user()->email }}</small></div>
+                            </div>
+                            <button type="button" data-modal-open="profile-edit" role="menuitem"><i class="fa-solid fa-user-pen"></i><span>Edit profile</span></button>
+                            <button type="button" data-modal-open="profile-edit" role="menuitem"><i class="fa-solid fa-key"></i><span>Update password</span></button>
+                            <a href="{{ route('dashboard.page', 'settings') }}" role="menuitem"><i class="fa-solid fa-gear"></i><span>Settings</span></a>
+                            <form class="logout-form dropdown-logout" method="POST" action="{{ route('logout') }}">
+                                @csrf
+                                <button type="submit" role="menuitem"><i class="fa-solid fa-arrow-right-from-bracket"></i><span>Logout</span></button>
+                            </form>
+                        </div>
+                    </div>
                 </div>
             </header>
 
-            <section class="welcome-panel">
-                <div>
-                    <span class="eyebrow">Welcome back, {{ auth()->user()->name }}</span>
-                    <h2>Campaigns are pacing 24% ahead this week.</h2>
-                    <p>Track revenue, ROAS, leads, and channel delivery from one clean Vuexy-inspired command center.</p>
-                    <a href="#campaigns">Review campaigns <i class="fa-solid fa-arrow-right"></i></a>
-                </div>
-                <div class="growth-widget" aria-label="Revenue progress">
-                    <span>Revenue</span>
-                    <strong>$128.4k</strong>
-                    <small>+18.6% vs last month</small>
-                </div>
-            </section>
+            @if (session('success'))
+                <div class="flash-message success" role="alert" data-auto-dismiss><i class="fa-solid fa-circle-check"></i>{{ session('success') }}</div>
+            @endif
+            @if (session('error'))
+                <div class="flash-message error" role="alert" data-auto-dismiss><i class="fa-solid fa-circle-exclamation"></i>{{ session('error') }}</div>
+            @endif
+            @if ($errors->any())
+                <div class="flash-message error" role="alert" data-auto-dismiss><i class="fa-solid fa-circle-exclamation"></i>{{ $errors->first() }}</div>
+            @endif
 
-            <section class="stats-grid" aria-label="Key metrics">
-                <article class="metric-card">
-                    <i class="fa-solid fa-sack-dollar"></i>
-                    <span>Revenue</span>
-                    <strong>$128.4k</strong>
-                    <small class="positive">+18.6%</small>
-                </article>
-                <article class="metric-card">
-                    <i class="fa-solid fa-user-plus"></i>
-                    <span>New Leads</span>
-                    <strong>2,841</strong>
-                    <small class="positive">+12.4%</small>
-                </article>
-                <article class="metric-card">
-                    <i class="fa-solid fa-chart-line"></i>
-                    <span>ROAS</span>
-                    <strong>5.8x</strong>
-                    <small class="positive">+0.9x</small>
-                </article>
-                <article class="metric-card">
-                    <i class="fa-solid fa-wallet"></i>
-                    <span>Ad Spend</span>
-                    <strong>$22.1k</strong>
-                    <small class="warning">-3.2%</small>
-                </article>
-            </section>
+            <section class="page-stage" data-page-stage>
+                @if ($page === 'campaigns')
+                    <section class="page-head">
+                        <div><span class="section-label">Campaigns</span><h2>Campaign Management</h2><p>Database-backed campaign records with modal add and edit workflows.</p></div>
 
-            <section class="dashboard-grid">
-                <article class="panel chart-panel">
-                    <div class="panel-head">
-                        <div>
-                            <span class="eyebrow">Performance</span>
-                            <h2>Revenue Overview</h2>
+    @if ($canManageUsers)<button class="primary-action" type="button" data-modal-open="campaign-create">Add campaign <i class="fa-solid fa-plus"></i></button>@endif
+                    </section>
+
+                    <article class="dashboard-panel table-panel full-panel">
+                        <div class="panel-header"><div><span class="section-label">Campaign table</span><h2>Live Campaign Records</h2></div></div>
+                        <div class="table-wrap">
+                            <table>
+                                <thead><tr><th>Campaign</th><th>Channel</th><th>Budget</th><th>Leads</th><th>ROAS</th><th>Status</th>@if ($canManageUsers)<th>Actions</th>@endif</tr></thead>
+                                <tbody>
+                                    @foreach ($campaigns as $campaign)
+                                        <tr class="animated-row">
+                                            <td><strong>{{ $campaign->name }}</strong><span>{{ $campaign->notes ?: 'No notes added' }}</span></td>
+                                            <td>{{ $campaign->channel }}</td>
+                                            <td>${{ number_format($campaign->budget, 0) }}</td>
+                                            <td>{{ number_format($campaign->leads) }}</td>
+                                            <td>{{ number_format($campaign->roas, 1) }}x</td>
+                                            <td><mark class="status {{ $campaign->status }}">{{ $statusLabels[$campaign->status] ?? ucfirst($campaign->status) }}</mark></td>
+
+
+    @if ($canManageUsers)
+                                                <td><div class="row-actions">
+                                                    <button class="icon-action" type="button" data-modal-open="campaign-edit-{{ $campaign->id }}" aria-label="Edit {{ $campaign->name }}"><i class="fa-solid fa-pen"></i></button>
+                                                    <form method="POST" action="{{ route('dashboard.campaigns.destroy', $campaign) }}">@csrf @method('DELETE')<button class="danger-button" type="submit" data-confirm-delete aria-label="Delete {{ $campaign->name }}"><i class="fa-solid fa-trash"></i></button></form>
+                                                </div></td>
+                                            @endif
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
                         </div>
-                        <button type="button">2026 <i class="fa-solid fa-chevron-down"></i></button>
-                    </div>
-                    <div class="bar-chart" aria-label="Monthly revenue chart">
-                        <span style="height: 46%"><b>Jan</b></span>
-                        <span style="height: 58%"><b>Feb</b></span>
-                        <span style="height: 52%"><b>Mar</b></span>
-                        <span style="height: 73%"><b>Apr</b></span>
-                        <span style="height: 68%"><b>May</b></span>
-                        <span style="height: 88%"><b>Jun</b></span>
-                        <span style="height: 76%"><b>Jul</b></span>
-                        <span style="height: 94%"><b>Aug</b></span>
-                    </div>
-                </article>
+                    </article>
+                @elseif ($page === 'users')
+                    <section class="page-head">
+                        <div><span class="section-label">Users</span><h2>User Management</h2><p>User records from the users table. Admins manage; authors view only.</p></div>
 
-                <article class="panel" id="channels">
-                    <div class="panel-head">
-                        <div>
-                            <span class="eyebrow">Channels</span>
-                            <h2>Traffic Split</h2>
-                        </div>
-                    </div>
-                    <div class="donut-wrap">
-                        <div class="donut" role="img" aria-label="Traffic split chart"></div>
-                        <div class="legend">
-                            <span><i class="seo"></i> SEO 42%</span>
-                            <span><i class="paid"></i> Paid 31%</span>
-                            <span><i class="social"></i> Social 19%</span>
-                            <span><i class="email"></i> Email 8%</span>
-                        </div>
-                    </div>
-                </article>
-            </section>
+    @if ($canManageUsers)<button class="primary-action" type="button" data-modal-open="user-create">Add user <i class="fa-solid fa-plus"></i></button>@endif
+                    </section>
 
-            <section class="dashboard-grid lower-grid">
-                <article class="panel table-panel" id="campaigns">
-                    <div class="panel-head">
-                        <div>
-                            <span class="eyebrow">Live campaigns</span>
-                            <h2>Campaign Performance</h2>
-                        </div>
-                        <button type="button">Export <i class="fa-solid fa-download"></i></button>
-                    </div>
-                    <div class="table-wrap">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Campaign</th>
-                                    <th>Channel</th>
-                                    <th>Budget</th>
-                                    <th>Leads</th>
-                                    <th>Status</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td><strong>Summer Scale</strong><span>Retail launch</span></td>
-                                    <td>Google Ads</td>
-                                    <td>$8,400</td>
-                                    <td>912</td>
-                                    <td><mark class="live">Live</mark></td>
-                                </tr>
-                                <tr>
-                                    <td><strong>Founder Webinar</strong><span>B2B pipeline</span></td>
-                                    <td>LinkedIn</td>
-                                    <td>$4,900</td>
-                                    <td>386</td>
-                                    <td><mark class="review">Review</mark></td>
-                                </tr>
-                                <tr>
-                                    <td><strong>Email Winback</strong><span>Lifecycle</span></td>
-                                    <td>Email</td>
-                                    <td>$1,250</td>
-                                    <td>548</td>
-                                    <td><mark class="live">Live</mark></td>
-                                </tr>
-                                <tr>
-                                    <td><strong>SEO Content Sprint</strong><span>Organic growth</span></td>
-                                    <td>Search</td>
-                                    <td>$3,700</td>
-                                    <td>995</td>
-                                    <td><mark class="planned">Planned</mark></td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </article>
+                    <article class="dashboard-panel table-panel full-panel">
+                        <div class="panel-header"><div><span class="section-label">Users table</span><h2>Email & Phone Directory</h2></div><mark class="access-badge">{{ $canManageUsers ? 'CRUD enabled' : 'View only' }}</mark></div>
+                        <div class="table-wrap">
+                            <table>
+                                <thead><tr><th>User</th><th>Email address</th><th>Phone number</th><th>Role</th>@if ($canManageUsers)<th>Actions</th>@endif</tr></thead>
+                                <tbody>
+                                    @foreach ($users as $user)
+                                        <tr class="animated-row">
+                                            <td><strong>{{ $user->name }}</strong><span>ID #{{ $user->id }}</span></td>
+                                            <td>{{ $user->email }}</td>
+                                            <td>{{ $user->phone ?: 'Not added' }}</td>
+                                            <td><mark class="role-badge">{{ $user->role?->name ?? 'No role' }}</mark></td>
 
-                <aside class="panel task-panel" id="tasks">
-                    <div class="panel-head">
-                        <div>
-                            <span class="eyebrow">Today</span>
-                            <h2>Priority Tasks</h2>
+    @if ($canManageUsers)
+                                                <td><div class="row-actions">
+                                                    <button class="icon-action" type="button" data-modal-open="user-edit-{{ $user->id }}" aria-label="Edit {{ $user->name }}"><i class="fa-solid fa-pen"></i></button>
+                                                    @unless ($user->is(auth()->user()))<form method="POST" action="{{ route('dashboard.users.destroy', $user) }}">@csrf @method('DELETE')<button class="danger-button" type="submit" data-confirm-delete aria-label="Delete {{ $user->name }}"><i class="fa-solid fa-trash"></i></button></form>@endunless
+                                                </div></td>
+                                            @endif
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
                         </div>
-                    </div>
-                    <label><input type="checkbox" checked> Approve PPC budget shift</label>
-                    <label><input type="checkbox"> Review Meta creatives</label>
-                    <label><input type="checkbox"> Send weekly client report</label>
-                    <label><input type="checkbox"> Publish SEO brief</label>
+                    </article>
+                @elseif ($page === 'reviews')
+                    <section class="page-head">
+                        <div><span class="section-label">Reviews</span><h2>Client Reviews</h2><p>Manage testimonials shown on the website slider.</p></div>
+                        @if ($canManageUsers)<button class="primary-action" type="button" data-modal-open="review-create">Add review <i class="fa-solid fa-plus"></i></button>@endif
+                    </section>
 
-                    <div class="activity-feed">
-                        <h3>Activity</h3>
-                        <p><span></span> ROAS alert triggered for Summer Scale.</p>
-                        <p><span></span> 146 leads added from LinkedIn forms.</p>
-                        <p><span></span> Email automation crossed 41% open rate.</p>
-                    </div>
-                </aside>
+                    <article class="dashboard-panel table-panel full-panel">
+                        <div class="panel-header"><div><span class="section-label">Reviews table</span><h2>Website Testimonials</h2></div><mark class="access-badge">{{ $reviews->where('is_published', true)->count() }} published</mark></div>
+                        <div class="table-wrap">
+                            <table>
+                                <thead><tr><th>Client</th><th>Review</th><th>Rating</th><th>Status</th><th>Order</th>@if ($canManageUsers)<th>Actions</th>@endif</tr></thead>
+                                <tbody>
+                                    @forelse ($reviews as $review)
+                                        <tr class="animated-row">
+                                            <td><strong>{{ $review->client_name }}</strong><span>{{ $review->client_role ?: 'No role added' }}</span></td>
+                                            <td><strong>{{ Str::limit($review->quote, 88) }}</strong><span>{{ $review->initials ?: 'No initials' }}</span></td>
+                                            <td><mark class="status live">@for ($star = 0; $star < $review->rating; $star++)<i class="fa-solid fa-star"></i>@endfor</mark></td>
+                                            <td><mark class="status {{ $review->is_published ? 'live' : 'paused' }}">{{ $review->is_published ? 'Published' : 'Hidden' }}</mark></td>
+                                            <td>{{ $review->sort_order }}</td>
+                                            @if ($canManageUsers)
+                                                <td><div class="row-actions">
+                                                    <button class="icon-action" type="button" data-modal-open="review-edit-{{ $review->id }}" aria-label="Edit review by {{ $review->client_name }}"><i class="fa-solid fa-pen"></i></button>
+                                                    <form method="POST" action="{{ route('dashboard.reviews.destroy', $review) }}">@csrf @method('DELETE')<button class="danger-button" type="submit" data-confirm-delete aria-label="Delete review by {{ $review->client_name }}"><i class="fa-solid fa-trash"></i></button></form>
+                                                </div></td>
+                                            @endif
+                                        </tr>
+                                    @empty
+                                        <tr><td colspan="{{ $canManageUsers ? 6 : 5 }}">No reviews added yet.</td></tr>
+                                    @endforelse
+                                </tbody>
+                            </table>
+                        </div>
+                    </article>
+                @elseif ($page === 'brands')
+                    <section class="page-head">
+                        <div><span class="section-label">Brands</span><h2>Trusted Brands</h2><p>Manage logos shown in the "Trusted by growing brands" strip on the website.</p></div>
+                        @if ($canManageUsers)<button class="primary-action" type="button" data-modal-open="brand-create">Add brand <i class="fa-solid fa-plus"></i></button>@endif
+                    </section>
+
+                    <article class="dashboard-panel table-panel full-panel">
+                        <div class="panel-header"><div><span class="section-label">Brand table</span><h2>Website Logo Strip</h2></div><mark class="access-badge">{{ $trustedBrands->where('is_published', true)->count() }} published</mark></div>
+                        <div class="table-wrap">
+                            <table>
+                                <thead><tr><th>Brand</th><th>Logo</th><th>Website</th><th>Status</th><th>Order</th>@if ($canManageUsers)<th>Actions</th>@endif</tr></thead>
+                                <tbody>
+                                    @forelse ($trustedBrands as $brand)
+                                        <tr class="animated-row">
+                                            <td><strong>{{ $brand->name }}</strong><span>ID #{{ $brand->id }}</span></td>
+                                            <td><div class="brand-logo-cell"><img src="{{ url($brand->logo_path) }}" alt="{{ $brand->name }} logo"></div></td>
+                                            <td>
+                                                @if ($brand->website_url)
+                                                    <a class="table-link" href="{{ $brand->website_url }}" target="_blank" rel="noopener">Open website</a>
+                                                @else
+                                                    <span>Not added</span>
+                                                @endif
+                                            </td>
+                                            <td><mark class="status {{ $brand->is_published ? 'live' : 'paused' }}">{{ $brand->is_published ? 'Published' : 'Hidden' }}</mark></td>
+                                            <td>{{ $brand->sort_order }}</td>
+                                            @if ($canManageUsers)
+                                                <td><div class="row-actions">
+                                                    <button class="icon-action" type="button" data-modal-open="brand-edit-{{ $brand->id }}" aria-label="Edit {{ $brand->name }}"><i class="fa-solid fa-pen"></i></button>
+                                                    <form method="POST" action="{{ route('dashboard.brands.destroy', $brand) }}">@csrf @method('DELETE')<button class="danger-button" type="submit" data-confirm-delete aria-label="Delete {{ $brand->name }}"><i class="fa-solid fa-trash"></i></button></form>
+                                                </div></td>
+                                            @endif
+                                        </tr>
+                                    @empty
+                                        <tr><td colspan="{{ $canManageUsers ? 6 : 5 }}">No trusted brands added yet.</td></tr>
+                                    @endforelse
+                                </tbody>
+                            </table>
+                        </div>
+                    </article>
+                @elseif ($page === 'contacts')
+                    <section class="page-head"><div><span class="section-label">Contacts</span><h2>Contact Requests</h2><p>Messages submitted from the website contact form.</p></div></section>
+                    <article class="dashboard-panel table-panel full-panel">
+                        <div class="panel-header"><div><span class="section-label">Inbox</span><h2>Website Leads</h2></div><mark class="access-badge">{{ $contactRequests->count() }} requests</mark></div>
+                        <div class="table-wrap">
+                            <table>
+                                <thead><tr><th>Contact</th><th>Service</th><th>Message</th><th>Submitted</th>@if ($canManageUsers)<th>Actions</th>@endif</tr></thead>
+                                <tbody>
+                                    @forelse ($contactRequests as $requestItem)
+                                        <tr class="animated-row">
+                                            <td><strong>{{ $requestItem->name }}</strong><span>{{ $requestItem->email }}{{ $requestItem->phone ? ' / ' . $requestItem->phone : '' }}{{ $requestItem->company ? ' / ' . $requestItem->company : '' }}</span></td>
+                                            <td><mark class="role-badge">{{ $requestItem->service }}</mark></td>
+                                            <td><strong>{{ Str::limit($requestItem->message, 110) }}</strong></td>
+                                            <td>{{ $requestItem->created_at->format('M d, Y h:i A') }}</td>
+                                            @if ($canManageUsers)
+                                                <td><div class="row-actions"><form method="POST" action="{{ route('dashboard.contact-requests.destroy', $requestItem) }}">@csrf @method('DELETE')<button class="danger-button" type="submit" data-confirm-delete aria-label="Delete request from {{ $requestItem->name }}"><i class="fa-solid fa-trash"></i></button></form></div></td>
+                                            @endif
+                                        </tr>
+                                    @empty
+                                        <tr><td colspan="{{ $canManageUsers ? 5 : 4 }}">No contact requests yet.</td></tr>
+                                    @endforelse
+                                </tbody>
+                            </table>
+                        </div>
+                    </article>
+                @elseif ($page === 'reports')
+                    <section class="page-head"><div><span class="section-label">Reports</span><h2>Channel Reports</h2><p>Report cards generated from campaign records.</p></div></section>
+                    <section class="report-grid">
+                        @foreach ($campaigns->groupBy('channel') as $channel => $items)
+                            <article class="dashboard-panel report-card"><span>{{ $channel }}</span><strong>{{ number_format($items->sum('leads')) }}</strong><small>${{ number_format($items->sum('budget'), 0) }} budget</small></article>
+                        @endforeach
+                    </section>
+                @elseif ($page === 'settings')
+                    <section class="page-head"><div><span class="section-label">Settings</span><h2>Workspace Settings</h2><p>Save phone, email, address, main logo, and transparent logo separately.</p></div></section>
+                    <section class="settings-field-grid">
+                        <article class="dashboard-panel setting-field-card">
+                            <div class="field-card-head"><div class="setting-icon"><i class="fa-solid fa-phone"></i></div><div><span class="section-label">Phone</span><h3>Phone number</h3></div></div>
+                            <form class="dashboard-form single-setting-form" method="POST" action="{{ route('dashboard.settings.field.update', 'phone') }}">
+                                @csrf
+                                <input type="text" name="phone" value="{{ old('phone', $siteSetting->phone) }}" placeholder="+44 7123 456789" inputmode="tel" maxlength="15" data-phone-mask="uk" @disabled(! $canManageUsers)>
+
+    @if ($canManageUsers)<button class="primary-action form-submit" type="submit">Save phone</button>@endif
+                            </form>
+                        </article>
+
+                        <article class="dashboard-panel setting-field-card">
+                            <div class="field-card-head"><div class="setting-icon"><i class="fa-solid fa-envelope"></i></div><div><span class="section-label">Email</span><h3>Email address</h3></div></div>
+                            <form class="dashboard-form single-setting-form" method="POST" action="{{ route('dashboard.settings.field.update', 'email') }}">
+                                @csrf
+                                <input type="email" name="email" value="{{ old('email', $siteSetting->email) }}" placeholder="hello@ssfmarketing.com" @disabled(! $canManageUsers)>
+
+    @if ($canManageUsers)<button class="primary-action form-submit" type="submit">Save email</button>@endif
+                            </form>
+                        </article>
+
+                        <article class="dashboard-panel setting-field-card wide-setting-card">
+                            <div class="field-card-head"><div class="setting-icon"><i class="fa-solid fa-location-dot"></i></div><div><span class="section-label">Address</span><h3>Office address</h3></div></div>
+                            <form class="dashboard-form single-setting-form" method="POST" action="{{ route('dashboard.settings.field.update', 'address') }}">
+                                @csrf
+                                <textarea name="address" rows="4" placeholder="Your office address" @disabled(! $canManageUsers)>{{ old('address', $siteSetting->address) }}</textarea>
+
+    @if ($canManageUsers)<button class="primary-action form-submit" type="submit">Save address</button>@endif
+                            </form>
+                        </article>
+
+                        <article class="dashboard-panel logo-setting-card">
+                            <div class="field-card-head"><div class="setting-icon"><i class="fa-solid fa-image"></i></div><div><span class="section-label">Logo</span><h3>Main logo</h3></div></div>
+                            <div class="logo-preview light-preview">
+                                @if ($siteSetting->logo_path)<img src="{{ url($siteSetting->logo_path) }}" alt="Main logo preview">@else<strong>No logo added</strong>@endif
+                            </div>
+                            <form class="dashboard-form single-setting-form" method="POST" action="{{ route('dashboard.settings.logo.update', 'logo') }}" enctype="multipart/form-data">
+                                @csrf
+                                <input type="file" name="logo" accept="image/*" @disabled(! $canManageUsers)>
+
+    @if ($canManageUsers)<button class="primary-action form-submit" type="submit">Save logo</button>@endif
+                            </form>
+                        </article>
+
+                        <article class="dashboard-panel logo-setting-card dark-card">
+                            <div class="field-card-head"><div class="setting-icon"><i class="fa-regular fa-image"></i></div><div><span class="section-label">Transparent</span><h3>Transparent logo</h3></div></div>
+                            <div class="logo-preview dark-preview">
+                                @if ($siteSetting->transparent_logo_path)<img src="{{ url($siteSetting->transparent_logo_path) }}" alt="Transparent logo preview">@else<strong>No transparent logo added</strong>@endif
+                            </div>
+                            <form class="dashboard-form single-setting-form" method="POST" action="{{ route('dashboard.settings.logo.update', 'transparent-logo') }}" enctype="multipart/form-data">
+                                @csrf
+                                <input type="file" name="transparent_logo" accept="image/*" @disabled(! $canManageUsers)>
+
+    @if ($canManageUsers)<button class="primary-action form-submit" type="submit">Save transparent logo</button>@endif
+                            </form>
+                        </article>
+
+                        <article class="dashboard-panel setting-field-card social-setting-card">
+                            <div class="field-card-head"><div class="setting-icon"><i class="fa-brands fa-linkedin-in"></i></div><div><span class="section-label">Social</span><h3>LinkedIn URL</h3></div></div>
+                            <form class="dashboard-form single-setting-form" method="POST" action="{{ route('dashboard.settings.field.update', 'linkedin_url') }}">
+                                @csrf
+                                <input type="url" name="linkedin_url" value="{{ old('linkedin_url', $siteSetting->linkedin_url) }}" placeholder="https://linkedin.com/company/your-brand" @disabled(! $canManageUsers)>
+                                @if ($canManageUsers)<button class="primary-action form-submit" type="submit">Save LinkedIn</button>@endif
+                            </form>
+                        </article>
+
+                        <article class="dashboard-panel setting-field-card social-setting-card">
+                            <div class="field-card-head"><div class="setting-icon"><i class="fa-brands fa-instagram"></i></div><div><span class="section-label">Social</span><h3>Instagram URL</h3></div></div>
+                            <form class="dashboard-form single-setting-form" method="POST" action="{{ route('dashboard.settings.field.update', 'instagram_url') }}">
+                                @csrf
+                                <input type="url" name="instagram_url" value="{{ old('instagram_url', $siteSetting->instagram_url) }}" placeholder="https://instagram.com/your-brand" @disabled(! $canManageUsers)>
+                                @if ($canManageUsers)<button class="primary-action form-submit" type="submit">Save Instagram</button>@endif
+                            </form>
+                        </article>
+
+                        <article class="dashboard-panel setting-field-card social-setting-card">
+                            <div class="field-card-head"><div class="setting-icon"><i class="fa-brands fa-facebook-f"></i></div><div><span class="section-label">Social</span><h3>Facebook URL</h3></div></div>
+                            <form class="dashboard-form single-setting-form" method="POST" action="{{ route('dashboard.settings.field.update', 'facebook_url') }}">
+                                @csrf
+                                <input type="url" name="facebook_url" value="{{ old('facebook_url', $siteSetting->facebook_url) }}" placeholder="https://facebook.com/your-brand" @disabled(! $canManageUsers)>
+                                @if ($canManageUsers)<button class="primary-action form-submit" type="submit">Save Facebook</button>@endif
+                            </form>
+                        </article>
+
+                        <article class="dashboard-panel setting-field-card social-setting-card">
+                            <div class="field-card-head"><div class="setting-icon"><i class="fa-brands fa-x-twitter"></i></div><div><span class="section-label">Social</span><h3>X URL</h3></div></div>
+                            <form class="dashboard-form single-setting-form" method="POST" action="{{ route('dashboard.settings.field.update', 'x_url') }}">
+                                @csrf
+                                <input type="url" name="x_url" value="{{ old('x_url', $siteSetting->x_url) }}" placeholder="https://x.com/your-brand" @disabled(! $canManageUsers)>
+                                @if ($canManageUsers)<button class="primary-action form-submit" type="submit">Save X</button>@endif
+                            </form>
+                        </article>
+
+                        <article class="dashboard-panel setting-field-card social-setting-card">
+                            <div class="field-card-head"><div class="setting-icon"><i class="fa-brands fa-youtube"></i></div><div><span class="section-label">Social</span><h3>YouTube URL</h3></div></div>
+                            <form class="dashboard-form single-setting-form" method="POST" action="{{ route('dashboard.settings.field.update', 'youtube_url') }}">
+                                @csrf
+                                <input type="url" name="youtube_url" value="{{ old('youtube_url', $siteSetting->youtube_url) }}" placeholder="https://youtube.com/@your-brand" @disabled(! $canManageUsers)>
+                                @if ($canManageUsers)<button class="primary-action form-submit" type="submit">Save YouTube</button>@endif
+                            </form>
+                        </article>
+                    </section>
+                @endif
             </section>
         </main>
     </div>
+
+    <div class="modal-backdrop" data-modal-backdrop hidden></div>
+
+    <section class="dashboard-modal" id="profile-edit" role="dialog" aria-modal="true" aria-labelledby="profile-edit-title" hidden>
+        <div class="modal-card"><button class="modal-close" type="button" data-modal-close aria-label="Close"><i class="fa-solid fa-xmark"></i></button><div class="modal-head"><span class="section-label">Account</span><h2 id="profile-edit-title">Edit Profile</h2></div>
+            <form class="dashboard-form" method="POST" action="{{ route('dashboard.profile.update') }}">
+                @csrf
+                @method('PUT')
+                <label><span>Name</span><input type="text" name="name" value="{{ old('name', auth()->user()->name) }}" required></label>
+                <label><span>Email address</span><input type="email" name="email" value="{{ old('email', auth()->user()->email) }}" required></label>
+                <label><span>Phone number</span><input type="text" name="phone" value="{{ old('phone', auth()->user()->phone) }}" placeholder="+44 7123 456789" inputmode="tel" maxlength="15" data-phone-mask="uk"></label>
+                <label><span>New password</span><input type="password" name="password" placeholder="Leave blank to keep current password"></label>
+                <button class="primary-action form-submit" type="submit">Update profile <i class="fa-solid fa-arrow-right"></i></button>
+            </form>
+        </div>
+    </section>
+
+    @if ($canManageUsers)
+        <section class="dashboard-modal" id="campaign-create" role="dialog" aria-modal="true" aria-labelledby="campaign-create-title" hidden>
+            <div class="modal-card"><button class="modal-close" type="button" data-modal-close aria-label="Close"><i class="fa-solid fa-xmark"></i></button><div class="modal-head"><span class="section-label">New campaign</span><h2 id="campaign-create-title">Add Campaign</h2></div>
+                @include('frontend.inc.dashboard-campaign-form', ['action' => route('dashboard.campaigns.store'), 'method' => null, 'campaign' => null, 'statusLabels' => $statusLabels])
+            </div>
+        </section>
+
+        @foreach ($campaigns as $campaign)
+            <section class="dashboard-modal" id="campaign-edit-{{ $campaign->id }}" role="dialog" aria-modal="true" aria-labelledby="campaign-edit-title-{{ $campaign->id }}" hidden>
+                <div class="modal-card"><button class="modal-close" type="button" data-modal-close aria-label="Close"><i class="fa-solid fa-xmark"></i></button><div class="modal-head"><span class="section-label">Edit campaign</span><h2 id="campaign-edit-title-{{ $campaign->id }}">{{ $campaign->name }}</h2></div>
+                    @include('frontend.inc.dashboard-campaign-form', ['action' => route('dashboard.campaigns.update', $campaign), 'method' => 'PUT', 'campaign' => $campaign, 'statusLabels' => $statusLabels])
+                </div>
+            </section>
+        @endforeach
+
+
+        <section class="dashboard-modal" id="review-create" role="dialog" aria-modal="true" aria-labelledby="review-create-title" hidden>
+            <div class="modal-card"><button class="modal-close" type="button" data-modal-close aria-label="Close"><i class="fa-solid fa-xmark"></i></button><div class="modal-head"><span class="section-label">New review</span><h2 id="review-create-title">Add Review</h2></div>
+                @include('frontend.inc.dashboard-review-form', ['action' => route('dashboard.reviews.store'), 'method' => null, 'reviewRecord' => null])
+            </div>
+        </section>
+
+        @foreach ($reviews as $review)
+            <section class="dashboard-modal" id="review-edit-{{ $review->id }}" role="dialog" aria-modal="true" aria-labelledby="review-edit-title-{{ $review->id }}" hidden>
+                <div class="modal-card"><button class="modal-close" type="button" data-modal-close aria-label="Close"><i class="fa-solid fa-xmark"></i></button><div class="modal-head"><span class="section-label">Edit review</span><h2 id="review-edit-title-{{ $review->id }}">{{ $review->client_name }}</h2></div>
+                    @include('frontend.inc.dashboard-review-form', ['action' => route('dashboard.reviews.update', $review), 'method' => 'PUT', 'reviewRecord' => $review])
+                </div>
+            </section>
+        @endforeach
+
+        <section class="dashboard-modal" id="brand-create" role="dialog" aria-modal="true" aria-labelledby="brand-create-title" hidden>
+            <div class="modal-card"><button class="modal-close" type="button" data-modal-close aria-label="Close"><i class="fa-solid fa-xmark"></i></button><div class="modal-head"><span class="section-label">New brand</span><h2 id="brand-create-title">Add Brand</h2></div>
+                @include('frontend.inc.dashboard-brand-form', ['action' => route('dashboard.brands.store'), 'method' => null, 'brandRecord' => null])
+            </div>
+        </section>
+
+        @foreach ($trustedBrands as $brand)
+            <section class="dashboard-modal" id="brand-edit-{{ $brand->id }}" role="dialog" aria-modal="true" aria-labelledby="brand-edit-title-{{ $brand->id }}" hidden>
+                <div class="modal-card"><button class="modal-close" type="button" data-modal-close aria-label="Close"><i class="fa-solid fa-xmark"></i></button><div class="modal-head"><span class="section-label">Edit brand</span><h2 id="brand-edit-title-{{ $brand->id }}">{{ $brand->name }}</h2></div>
+                    @include('frontend.inc.dashboard-brand-form', ['action' => route('dashboard.brands.update', $brand), 'method' => 'PUT', 'brandRecord' => $brand])
+                </div>
+            </section>
+        @endforeach
+        <section class="dashboard-modal" id="user-create" role="dialog" aria-modal="true" aria-labelledby="user-create-title" hidden>
+            <div class="modal-card"><button class="modal-close" type="button" data-modal-close aria-label="Close"><i class="fa-solid fa-xmark"></i></button><div class="modal-head"><span class="section-label">New user</span><h2 id="user-create-title">Add User</h2></div>
+                @include('frontend.inc.dashboard-user-form', ['action' => route('dashboard.users.store'), 'method' => null, 'userRecord' => null, 'roles' => $roles])
+            </div>
+        </section>
+
+        @foreach ($users as $user)
+            <section class="dashboard-modal" id="user-edit-{{ $user->id }}" role="dialog" aria-modal="true" aria-labelledby="user-edit-title-{{ $user->id }}" hidden>
+                <div class="modal-card"><button class="modal-close" type="button" data-modal-close aria-label="Close"><i class="fa-solid fa-xmark"></i></button><div class="modal-head"><span class="section-label">Edit user</span><h2 id="user-edit-title-{{ $user->id }}">{{ $user->name }}</h2></div>
+                    @include('frontend.inc.dashboard-user-form', ['action' => route('dashboard.users.update', $user), 'method' => 'PUT', 'userRecord' => $user, 'roles' => $roles])
+                </div>
+            </section>
+        @endforeach
+    @endif
+
+    <script src="{{ url('frontend/assets/js/dashboard.js') }}"></script>
 </body>
 </html>
+
+
+
+
+
+

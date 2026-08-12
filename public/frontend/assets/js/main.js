@@ -61,19 +61,23 @@ document.querySelectorAll(sharedRevealSelectors.join(',')).forEach((element, ind
 
 document.querySelectorAll('.reveal').forEach(element => revealObserver.observe(element));
 
-const testimonials = [
-  { quote: 'Markit transformed our online presence and accelerated our marketing results. Our leads rose, and sales have never been better.', initials: 'JD', name: 'John Davis', role: 'CEO, TechSolutions' },
-  { quote: 'The team brought clarity to our growth strategy. Within one quarter, acquisition costs fell while qualified pipeline reached a new high.', initials: 'SM', name: 'Sarah Mitchell', role: 'Founder, Northstar Studio' },
-  { quote: 'A rare partner that understands both creative storytelling and commercial performance. Markit now feels like part of our internal team.', initials: 'AR', name: 'Alex Rivera', role: 'CMO, Elevate Labs' }
-];
+const testimonialBox = document.querySelector('#testimonial');
+const testimonials = (() => {
+  if (!testimonialBox?.dataset.testimonials) return [];
+  try {
+    return JSON.parse(testimonialBox.dataset.testimonials);
+  } catch (error) {
+    return [];
+  }
+})();
 
 let currentTestimonial = 0;
-const testimonialBox = document.querySelector('#testimonial');
 
 function renderTestimonial() {
-  if (!testimonialBox) return;
+  if (!testimonialBox || !testimonials.length) return;
   const item = testimonials[currentTestimonial];
-  testimonialBox.innerHTML = `<div class="quote-mark">“</div><div class="stars">★★★★★</div><blockquote>${item.quote}</blockquote><div class="client"><span>${item.initials}</span><div><b>${item.name}</b><small>${item.role}</small></div></div>`;
+  const stars = '<i class="fa-solid fa-star"></i>'.repeat(Math.max(1, Math.min(Number(item.rating || 5), 5)));
+  testimonialBox.innerHTML = `<div class="quote-mark">“</div><div class="stars">${stars}</div><blockquote>${item.quote}</blockquote><div class="client"><span>${item.initials || 'SS'}</span><div><b>${item.name}</b><small>${item.role || ''}</small></div></div>`;
   testimonialBox.animate([{ opacity: 0.2, transform: 'translateX(18px)' }, { opacity: 1, transform: 'translateX(0)' }], { duration: 360, easing: 'ease-out' });
 }
 
@@ -276,7 +280,7 @@ document.querySelectorAll('.logo-slider:not([data-loop="marquee"])').forEach(ini
 document.querySelectorAll(".scorecard > div, .purpose-layout article, .values-grid article, .team-card").forEach(card => { card.addEventListener("pointermove", event => { const box = card.getBoundingClientRect(); card.style.setProperty("--mx", ((event.clientX-box.left)/box.width*100)+"%"); card.style.setProperty("--my", ((event.clientY-box.top)/box.height*100)+"%"); }); }); const storyVisual=document.querySelector(".story-image"); if(storyVisual && !reduceMotion){ window.addEventListener("scroll",()=>{ const box=storyVisual.getBoundingClientRect(); if(box.bottom>0 && box.top<innerHeight){ const shift=(box.top-innerHeight/2)*-.018; storyVisual.style.transform="translate3d(0,"+shift+"px,0)"; } },{passive:true}); } document.querySelectorAll(".team-card").forEach(card=>{card.addEventListener("pointermove",event=>{const box=card.getBoundingClientRect();const x=(event.clientX-box.left)/box.width-.5;const y=(event.clientY-box.top)/box.height-.5;card.style.transform="perspective(900px) rotateY("+(x*3)+"deg) rotateX("+(-y*3)+"deg) translateY(-7px)";});card.addEventListener("pointerleave",()=>{card.style.transform="";});});
 
 // Contact page interactions
-document.querySelectorAll(".faq-item button").forEach(button=>button.addEventListener("click",()=>{const item=button.closest(".faq-item");const wasOpen=item.classList.contains("open");document.querySelectorAll(".faq-item").forEach(entry=>{entry.classList.remove("open");entry.querySelector("button").setAttribute("aria-expanded","false");entry.querySelector("button b").textContent="+";});if(!wasOpen){item.classList.add("open");button.setAttribute("aria-expanded","true");button.querySelector("b").textContent="−";}}));document.querySelector(".contact-form")?.addEventListener("submit",event=>{event.preventDefault();event.currentTarget.classList.add("sent");});document.querySelectorAll(".contact-info-card,.faq-item,.project-banner").forEach(card=>{card.addEventListener("pointermove",event=>{const box=card.getBoundingClientRect();card.style.setProperty("--mx",((event.clientX-box.left)/box.width*100)+"%");card.style.setProperty("--my",((event.clientY-box.top)/box.height*100)+"%");});});
+document.querySelectorAll(".faq-item button").forEach(button=>button.addEventListener("click",()=>{const item=button.closest(".faq-item");const wasOpen=item.classList.contains("open");document.querySelectorAll(".faq-item").forEach(entry=>{entry.classList.remove("open");entry.querySelector("button").setAttribute("aria-expanded","false");entry.querySelector("button b").textContent="+";});if(!wasOpen){item.classList.add("open");button.setAttribute("aria-expanded","true");button.querySelector("b").textContent="−";}}));document.querySelectorAll(".contact-info-card,.faq-item,.project-banner").forEach(card=>{card.addEventListener("pointermove",event=>{const box=card.getBoundingClientRect();card.style.setProperty("--mx",((event.clientX-box.left)/box.width*100)+"%");card.style.setProperty("--my",((event.clientY-box.top)/box.height*100)+"%");});});
 
 // SEO page interactions
 const seoHoverTargets = document.querySelectorAll('.seo-service-cards article, .seo-benefit-grid article, .seo-process-line article, .seo-stat, .seo-case-card, .seo-case-metrics div, .seo-tool-logos span');
@@ -296,3 +300,48 @@ socialHoverTargets.forEach(card => {
     card.style.setProperty('--my', ((event.clientY - box.top) / box.height * 100) + '%');
   });
 });
+
+function bindAutoDismissMessages(root = document) {
+  root.querySelectorAll('[data-auto-dismiss]').forEach(message => {
+    if (message.dataset.dismissBound === 'true') return;
+    message.dataset.dismissBound = 'true';
+    window.setTimeout(() => {
+      message.classList.add('is-hiding');
+      window.setTimeout(() => message.remove(), 360);
+    }, 4200);
+  });
+}
+
+bindAutoDismissMessages();
+function bindUkPhoneMasks(root = document) {
+  const formatUkPhone = (rawValue) => {
+    let digits = String(rawValue || '').replace(/\D/g, '');
+
+    if (digits.startsWith('0044')) digits = digits.slice(4);
+    else if (digits.startsWith('44')) digits = digits.slice(2);
+    else if (digits.startsWith('0')) digits = digits.slice(1);
+
+    digits = digits.slice(0, 10);
+    if (!digits) return '';
+
+    const first = digits.slice(0, 4);
+    const second = digits.slice(4, 10);
+
+    return `+44 ${first}${second ? ` ${second}` : ''}`;
+  };
+
+  root.querySelectorAll('[data-phone-mask="uk"]').forEach(input => {
+    if (input.dataset.phoneMaskBound === 'true') return;
+    input.dataset.phoneMaskBound = 'true';
+
+    const applyMask = () => {
+      input.value = formatUkPhone(input.value);
+    };
+
+    input.addEventListener('input', applyMask);
+    input.addEventListener('blur', applyMask);
+    applyMask();
+  });
+}
+
+bindUkPhoneMasks();

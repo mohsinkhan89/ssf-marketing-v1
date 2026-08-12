@@ -1,32 +1,42 @@
 <footer class="footer">
          <div class="container footer-top">
             <div class="footer-brand">
-               <a class="brand" href="index.html"
+               <a class="brand" href="{{ route('home') }}"
                   ><img
                      class="brand-logo"
-                     src="{{ url('frontend/assets/images/logo/logo.png') }}"
+                     src="{{ url($siteSetting?->transparent_logo_path ?? $siteSetting?->logo_path ?? 'frontend/assets/images/logo/logo.png') }}"
                      alt="Markit"
                /></a>
                <p>
                   We turn ambitious business goals into focused digital
                   strategies, memorable creative and measurable growth.
                </p>
-               <div class="social-links">
-                  <a href="social-media.html" aria-label="LinkedIn"
-                     ><span>in</span></a
-                  ><a href="social-media.html" aria-label="Instagram"
-                     ><span>ig</span></a
-                  ><a href="social-media.html" aria-label="X"><span>x</span></a>
-               </div>
+               @php
+                  $socialLinks = [
+                     ['label' => 'LinkedIn', 'url' => $siteSetting?->linkedin_url, 'icon' => 'fa-linkedin-in'],
+                     ['label' => 'Instagram', 'url' => $siteSetting?->instagram_url, 'icon' => 'fa-instagram'],
+                     ['label' => 'Facebook', 'url' => $siteSetting?->facebook_url, 'icon' => 'fa-facebook-f'],
+                     ['label' => 'X', 'url' => $siteSetting?->x_url, 'icon' => 'fa-x-twitter'],
+                     ['label' => 'YouTube', 'url' => $siteSetting?->youtube_url, 'icon' => 'fa-youtube'],
+                  ];
+                  $visibleSocialLinks = collect($socialLinks)->filter(fn ($link) => filled($link['url']));
+               @endphp
+               @if ($visibleSocialLinks->isNotEmpty())
+                  <div class="social-links">
+                     @foreach ($visibleSocialLinks as $link)
+                        <a href="{{ $link['url'] }}" target="_blank" rel="noopener" aria-label="{{ $link['label'] }}"><i class="fa-brands {{ $link['icon'] }}" aria-hidden="true"></i></a>
+                     @endforeach
+                  </div>
+               @endif
             </div>
             <div class="footer-links">
                <div>
                   <h3>Company</h3>
-                  <a href="index.html">Home</a
+                  <a href="{{ route('home') }}">Home</a
                   ><a href="about-us.html">About us</a
                   ><a href="index.html#work">Our work</a
                   ><a href="index.html#insights">Insights</a
-                  ><a href="contact-us.html">Contact</a>
+                  ><a href="{{ route('contact-us') }}">Contact</a>
                </div>
                <div>
                   <h3>Services</h3>
@@ -40,12 +50,12 @@
             <div class="footer-contact-card">
                <span class="contact-label">Have a project in mind?</span>
                <h3>Let's create something that performs.</h3>
-               <a class="footer-email" href="mailto:hello@markit.com"
-                  >hello@markit.com <span>-&gt;</span></a
+               <a class="footer-email" href="mailto:{{ $siteSetting?->email ?? 'hello@markit.com' }}"
+                  >{{ $siteSetting?->email ?? 'hello@markit.com' }} <span>-&gt;</span></a
                >
                <div class="footer-contact-meta">
-                  <a href="tel:+15551234567">+1 555 123 4567</a
-                  ><span>New York - London - Remote</span>
+                  <a href="tel:{{ preg_replace('/[^0-9+]/', '', $siteSetting?->phone ?? '+15551234567') }}">{{ $siteSetting?->phone ?? '+1 555 123 4567' }}</a
+                  ><span>{{ $siteSetting?->address ?? 'New York - London - Remote' }}</span>
                </div>
             </div>
          </div>
@@ -53,7 +63,9 @@
             <span>&copy; 2026 Markit Agency. All rights reserved.</span>
             <div>
                <a href="about-us.html">About Markit</a
-               ><a href="contact-us.html">Contact us</a>
+               ><a href="{{ route('contact-us') }}">Contact us</a>
             </div>
          </div>
       </footer>
+
+
