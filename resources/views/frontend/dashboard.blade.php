@@ -320,6 +320,51 @@
     @if ($canManageUsers)<button class="primary-action form-submit" type="submit">Save transparent logo</button>@endif
                             </form>
                         </article>
+
+                        <article class="dashboard-panel setting-field-card social-setting-card">
+                            <div class="field-card-head"><div class="setting-icon"><i class="fa-brands fa-linkedin-in"></i></div><div><span class="section-label">Social</span><h3>LinkedIn URL</h3></div></div>
+                            <form class="dashboard-form single-setting-form" method="POST" action="{{ route('dashboard.settings.field.update', 'linkedin_url') }}">
+                                @csrf
+                                <input type="url" name="linkedin_url" value="{{ old('linkedin_url', $siteSetting->linkedin_url) }}" placeholder="https://linkedin.com/company/your-brand" @disabled(! $canManageUsers)>
+                                @if ($canManageUsers)<button class="primary-action form-submit" type="submit">Save LinkedIn</button>@endif
+                            </form>
+                        </article>
+
+                        <article class="dashboard-panel setting-field-card social-setting-card">
+                            <div class="field-card-head"><div class="setting-icon"><i class="fa-brands fa-instagram"></i></div><div><span class="section-label">Social</span><h3>Instagram URL</h3></div></div>
+                            <form class="dashboard-form single-setting-form" method="POST" action="{{ route('dashboard.settings.field.update', 'instagram_url') }}">
+                                @csrf
+                                <input type="url" name="instagram_url" value="{{ old('instagram_url', $siteSetting->instagram_url) }}" placeholder="https://instagram.com/your-brand" @disabled(! $canManageUsers)>
+                                @if ($canManageUsers)<button class="primary-action form-submit" type="submit">Save Instagram</button>@endif
+                            </form>
+                        </article>
+
+                        <article class="dashboard-panel setting-field-card social-setting-card">
+                            <div class="field-card-head"><div class="setting-icon"><i class="fa-brands fa-facebook-f"></i></div><div><span class="section-label">Social</span><h3>Facebook URL</h3></div></div>
+                            <form class="dashboard-form single-setting-form" method="POST" action="{{ route('dashboard.settings.field.update', 'facebook_url') }}">
+                                @csrf
+                                <input type="url" name="facebook_url" value="{{ old('facebook_url', $siteSetting->facebook_url) }}" placeholder="https://facebook.com/your-brand" @disabled(! $canManageUsers)>
+                                @if ($canManageUsers)<button class="primary-action form-submit" type="submit">Save Facebook</button>@endif
+                            </form>
+                        </article>
+
+                        <article class="dashboard-panel setting-field-card social-setting-card">
+                            <div class="field-card-head"><div class="setting-icon"><i class="fa-brands fa-x-twitter"></i></div><div><span class="section-label">Social</span><h3>X URL</h3></div></div>
+                            <form class="dashboard-form single-setting-form" method="POST" action="{{ route('dashboard.settings.field.update', 'x_url') }}">
+                                @csrf
+                                <input type="url" name="x_url" value="{{ old('x_url', $siteSetting->x_url) }}" placeholder="https://x.com/your-brand" @disabled(! $canManageUsers)>
+                                @if ($canManageUsers)<button class="primary-action form-submit" type="submit">Save X</button>@endif
+                            </form>
+                        </article>
+
+                        <article class="dashboard-panel setting-field-card social-setting-card">
+                            <div class="field-card-head"><div class="setting-icon"><i class="fa-brands fa-youtube"></i></div><div><span class="section-label">Social</span><h3>YouTube URL</h3></div></div>
+                            <form class="dashboard-form single-setting-form" method="POST" action="{{ route('dashboard.settings.field.update', 'youtube_url') }}">
+                                @csrf
+                                <input type="url" name="youtube_url" value="{{ old('youtube_url', $siteSetting->youtube_url) }}" placeholder="https://youtube.com/@your-brand" @disabled(! $canManageUsers)>
+                                @if ($canManageUsers)<button class="primary-action form-submit" type="submit">Save YouTube</button>@endif
+                            </form>
+                        </article>
                     </section>
                 @endif
             </section>
@@ -403,6 +448,9 @@
     <script src="{{ url('frontend/assets/js/dashboard.js') }}"></script>
 </body>
 </html>
+
+
+
 
 
 

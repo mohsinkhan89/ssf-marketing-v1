@@ -284,6 +284,11 @@ class FrontendController extends Controller
             'address' => ['nullable', 'string', 'max:1000'],
             'logo' => ['nullable', 'image', 'max:2048'],
             'transparent_logo' => ['nullable', 'image', 'max:2048'],
+            'linkedin_url' => ['nullable', 'url', 'max:255'],
+            'instagram_url' => ['nullable', 'url', 'max:255'],
+            'facebook_url' => ['nullable', 'url', 'max:255'],
+            'x_url' => ['nullable', 'url', 'max:255'],
+            'youtube_url' => ['nullable', 'url', 'max:255'],
         ]);
 
         $setting = SiteSetting::current();
@@ -291,6 +296,11 @@ class FrontendController extends Controller
             'phone' => $validated['phone'] ?? null,
             'email' => $validated['email'] ?? null,
             'address' => $validated['address'] ?? null,
+            'linkedin_url' => $validated['linkedin_url'] ?? null,
+            'instagram_url' => $validated['instagram_url'] ?? null,
+            'facebook_url' => $validated['facebook_url'] ?? null,
+            'x_url' => $validated['x_url'] ?? null,
+            'youtube_url' => $validated['youtube_url'] ?? null,
         ];
 
         if ($request->hasFile('logo')) {
@@ -314,6 +324,11 @@ class FrontendController extends Controller
             'phone' => ['phone' => ['nullable', 'string', 'max:50']],
             'email' => ['email' => ['nullable', 'email', 'max:255']],
             'address' => ['address' => ['nullable', 'string', 'max:1000']],
+            'linkedin_url' => ['linkedin_url' => ['nullable', 'url', 'max:255']],
+            'instagram_url' => ['instagram_url' => ['nullable', 'url', 'max:255']],
+            'facebook_url' => ['facebook_url' => ['nullable', 'url', 'max:255']],
+            'x_url' => ['x_url' => ['nullable', 'url', 'max:255']],
+            'youtube_url' => ['youtube_url' => ['nullable', 'url', 'max:255']],
         ];
 
         abort_unless(array_key_exists($field, $rules), 404);
@@ -324,7 +339,7 @@ class FrontendController extends Controller
             $field => $validated[$field] ?? null,
         ]);
 
-        return redirect()->to(route('dashboard.page', 'settings'))->with('success', ucfirst($field) . ' updated successfully.');
+        return redirect()->to(route('dashboard.page', 'settings'))->with('success', str_replace('_', ' ', ucfirst($field)) . ' updated successfully.');
     }
 
     public function updateSettingLogo(Request $request, string $type): RedirectResponse
@@ -450,4 +465,7 @@ class FrontendController extends Controller
         abort_unless(auth()->user()?->canManageUsers(), 403);
     }
 }
+
+
+
 

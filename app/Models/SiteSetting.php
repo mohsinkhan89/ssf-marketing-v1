@@ -15,6 +15,11 @@ class SiteSetting extends Model
         'address',
         'logo_path',
         'transparent_logo_path',
+        'linkedin_url',
+        'instagram_url',
+        'facebook_url',
+        'x_url',
+        'youtube_url',
     ];
 
     public static function current(): self
