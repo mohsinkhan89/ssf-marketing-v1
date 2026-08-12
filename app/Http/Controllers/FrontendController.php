@@ -7,6 +7,7 @@ use App\Models\ContactRequest;
 use App\Models\Review;
 use App\Models\Role;
 use App\Models\SiteSetting;
+use App\Models\SocialLink;
 use App\Models\TrustedBrand;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
@@ -78,6 +79,7 @@ class FrontendController extends Controller
             'contactRequests' => ContactRequest::latest()->get(),
             'roles' => $assignableRoles,
             'siteSetting' => SiteSetting::current(),
+            'socialLinks' => SocialLink::ordered()->get(),
             'canManageUsers' => auth()->user()->canManageUsers(),
             'stats' => [
                 'budget' => $totalBudget,
@@ -274,6 +276,32 @@ class FrontendController extends Controller
 
         return redirect()->to(route('dashboard.page', 'brands'))->with('success', 'Trusted brand deleted successfully.');
     }
+    public function storeSocialLink(Request $request): RedirectResponse
+    {
+        $this->authorizeManagement();
+
+        SocialLink::create($this->socialLinkData($request));
+
+        return redirect()->to(route('dashboard.page', 'settings'))->with('success', 'Social link added successfully.');
+    }
+
+    public function updateSocialLink(Request $request, SocialLink $socialLink): RedirectResponse
+    {
+        $this->authorizeManagement();
+
+        $socialLink->update($this->socialLinkData($request));
+
+        return redirect()->to(route('dashboard.page', 'settings'))->with('success', 'Social link updated successfully.');
+    }
+
+    public function destroySocialLink(SocialLink $socialLink): RedirectResponse
+    {
+        $this->authorizeManagement();
+
+        $socialLink->delete();
+
+        return redirect()->to(route('dashboard.page', 'settings'))->with('success', 'Social link deleted successfully.');
+    }
     public function updateSettings(Request $request): RedirectResponse
     {
         $this->authorizeManagement();
@@ -340,6 +368,42 @@ class FrontendController extends Controller
         ]);
 
         return redirect()->to(route('dashboard.page', 'settings'))->with('success', str_replace('_', ' ', ucfirst($field)) . ' updated successfully.');
+    }
+
+
+    public function clearSettingField(string $field): RedirectResponse
+    {
+        $this->authorizeManagement();
+
+        $allowedFields = [
+            'phone',
+            'email',
+            'address',
+            'linkedin_url',
+            'instagram_url',
+            'facebook_url',
+            'x_url',
+            'youtube_url',
+        ];
+
+        abort_unless(in_array($field, $allowedFields, true), 404);
+
+        SiteSetting::current()->update([$field => null]);
+
+        return redirect()->to(route('dashboard.page', 'settings'))->with('success', str_replace('_', ' ', ucfirst($field)) . ' deleted successfully.');
+    }
+
+    public function clearSettingLogo(string $type): RedirectResponse
+    {
+        $this->authorizeManagement();
+
+        abort_unless(in_array($type, ['logo', 'transparent-logo'], true), 404);
+
+        $column = $type === 'logo' ? 'logo_path' : 'transparent_logo_path';
+
+        SiteSetting::current()->update([$column => null]);
+
+        return redirect()->to(route('dashboard.page', 'settings'))->with('success', ($type === 'logo' ? 'Logo' : 'Transparent logo') . ' deleted successfully.');
     }
 
     public function updateSettingLogo(Request $request, string $type): RedirectResponse
@@ -409,6 +473,21 @@ class FrontendController extends Controller
         return $validated;
     }
 
+    private function socialLinkData(Request $request): array
+    {
+        $validated = $request->validate([
+            'label' => ['required', 'string', 'max:80'],
+            'url' => ['required', 'url', 'max:255'],
+            'icon_class' => ['required', 'string', 'max:80', 'regex:/^[a-z0-9-]+$/i'],
+            'sort_order' => ['nullable', 'integer', 'min:0', 'max:999999'],
+            'is_published' => ['nullable', 'boolean'],
+        ]);
+
+        $validated['sort_order'] = $validated['sort_order'] ?? 0;
+        $validated['is_published'] = $request->boolean('is_published');
+
+        return $validated;
+    }
     private function trustedBrandData(Request $request, ?TrustedBrand $brand = null): array
     {
         $validated = $request->validate([
@@ -465,6 +544,8 @@ class FrontendController extends Controller
         abort_unless(auth()->user()?->canManageUsers(), 403);
     }
 }
+
+
 
 
 
