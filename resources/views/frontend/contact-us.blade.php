@@ -11,6 +11,12 @@ Contact US - SSF Marketing
 @endsection
 
 @section('body')
+    @php
+        $sitePhone = $siteSetting?->phone ?: '+1 (555) 123-4567';
+        $sitePhoneLink = preg_replace('/[^0-9+]/', '', $sitePhone);
+        $siteEmail = $siteSetting?->email ?: 'hello@markit.com';
+        $siteAddress = $siteSetting?->address ?: '123 Market Street, Suite 100, New York, NY 10001, USA';
+    @endphp
 
     <main>
         <section class="contact-hero">
@@ -113,25 +119,23 @@ Contact US - SSF Marketing
         </section>
         <section class="contact-info">
             <div class="container contact-info-grid">
-                <a href="tel:+15551234567" class="contact-info-card reveal"
+                <a href="tel:{{ $sitePhoneLink }}" class="contact-info-card reveal"
                     ><i class="fa-solid fa-phone"></i
                     ><span
-                    ><b>Call Us</b><strong>+1 (555) 123-4567</strong
+                    ><b>Call Us</b><strong>{{ $sitePhone }}</strong
                     ><small>Mon–Fri, 9:00 AM – 6:00 PM EST</small></span
                     ></a
-                ><a href="mailto:hello@markit.com" class="contact-info-card reveal"
+                ><a href="mailto:{{ $siteEmail }}" class="contact-info-card reveal"
                     ><i class="fa-solid fa-envelope"></i
                     ><span
-                    ><b>Email Us</b><strong>hello@markit.com</strong
+                    ><b>Email Us</b><strong>{{ $siteEmail }}</strong
                     ><small>We'll respond within 1 business day</small></span
                     ></a
                 ><a href="#location" class="contact-info-card reveal"
                     ><i class="fa-solid fa-location-dot"></i
                     ><span
                     ><b>Visit Us</b
-                    ><strong
-                        >123 Market Street, Suite 100<br />New York, NY 10001,
-                        USA</strong
+                    ><strong>{{ $siteAddress }}</strong
                     ><small>By appointment only</small></span
                     ></a
                 >
@@ -168,13 +172,21 @@ Contact US - SSF Marketing
                     >
                     </div>
                 </div>
-                <form class="contact-form reveal" action="#" method="post">
+                <form class="contact-form reveal" action="{{ route('contact-us.store') }}" method="post">
+                    @csrf
+                    @if (session('contact_success'))
+                        <div class="form-alert success" role="status" data-auto-dismiss><i class="fa-solid fa-circle-check"></i><span>{{ session('contact_success') }}</span></div>
+                    @endif
+                    @if ($errors->any())
+                        <div class="form-alert error" role="alert" data-auto-dismiss><i class="fa-solid fa-circle-exclamation"></i><span>{{ $errors->first() }}</span></div>
+                    @endif
                     <div class="form-grid">
                     <label
                         >Full Name <b>*</b
                         ><input
                             type="text"
                             name="name"
+                            value="{{ old('name') }}"
                             placeholder="Enter your full name"
                             required /></label
                     ><label
@@ -182,27 +194,30 @@ Contact US - SSF Marketing
                         ><input
                             type="email"
                             name="email"
+                            value="{{ old('email') }}"
                             placeholder="Enter your email"
                             required /></label
                     ><label
                         >Company Name<input
                             type="text"
                             name="company"
+                            value="{{ old('company') }}"
                             placeholder="Enter your company name" /></label
                     ><label
                         >Phone Number<input
                             type="tel"
                             name="phone"
-                            placeholder="Enter your phone number" /></label
+                            value="{{ old('phone') }}"
+                            placeholder="+44 7123 456789" inputmode="tel" maxlength="15" data-phone-mask="uk" /></label
                     ><label class="full"
                         >What Can We Help You With? <b>*</b
                         ><select name="service" required>
-                            <option value>Select a service</option>
-                            <option>Search &amp; SEO</option>
-                            <option>Paid Media</option>
-                            <option>Creative Studio</option>
-                            <option>CRO &amp; Analytics</option>
-                            <option>Full Growth Strategy</option>
+                            <option value="">Select a service</option>
+                            <option @selected(old('service') === 'Search & SEO')>Search &amp; SEO</option>
+                            <option @selected(old('service') === 'Paid Media')>Paid Media</option>
+                            <option @selected(old('service') === 'Creative Studio')>Creative Studio</option>
+                            <option @selected(old('service') === 'CRO & Analytics')>CRO &amp; Analytics</option>
+                            <option @selected(old('service') === 'Full Growth Strategy')>Full Growth Strategy</option>
                         </select></label
                     ><label class="full"
                         >Message <b>*</b
@@ -210,7 +225,7 @@ Contact US - SSF Marketing
                             name="message"
                             placeholder="Tell us about your project, goals, or any questions you have..."
                             required
-                        ></textarea>
+                        >{{ old('message') }}</textarea>
                     </label>
                     </div>
                     <div class="form-bottom">
@@ -234,9 +249,6 @@ Contact US - SSF Marketing
                         ></lord-icon>
                     </button>
                     </div>
-                    <div class="form-success" role="status">
-                    Thanks! Your message is ready to send.
-                    </div>
                 </form>
             </div>
         </section>
@@ -248,10 +260,10 @@ Contact US - SSF Marketing
                     <div class="map-address">
                     <small>Our office</small>
                     <h3>Markit Headquarters</h3>
-                    <p>123 Market Street, Suite 100<br />New York, NY 10001, USA</p>
+                    <p>{{ $siteAddress }}</p>
                     <a
                         class="button button-ghost directions-button"
-                        href="https://maps.google.com/?q=123+Market+Street+New+York"
+                        href="https://maps.google.com/?q={{ urlencode($siteAddress) }}"
                         target="_blank"
                         rel="noopener"
                         ><span>Get Directions</span
@@ -342,7 +354,7 @@ Contact US - SSF Marketing
                     <p>Quick answers to common questions about working with Markit.</p>
                     <a
                     class="button result-button contact-question-button"
-                    href="mailto:hello@markit.com"
+                    href="mailto:{{ $siteEmail }}"
                     ><span>Still Have Questions?</span
                     ><lord-icon
                         src="https://cdn.lordicon.com/vduvxizq.json"
