@@ -70,7 +70,7 @@ class FrontendController extends Controller
 
         $assignableRoles = $this->assignableRoles();
 
-        return view('frontend.dashboard', [
+        return view('dashboard.index', [
             'page' => $page,
             'users' => User::with('role')->latest()->get(),
             'campaigns' => $campaigns,
@@ -544,6 +544,7 @@ class FrontendController extends Controller
         abort_unless(auth()->user()?->canManageUsers(), 403);
     }
 }
+
 
 
 

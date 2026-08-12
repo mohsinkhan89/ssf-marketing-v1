@@ -11,7 +11,7 @@ class AuthController extends Controller
 {
     public function showLogin(): View
     {
-        return view('auth.login');
+        return view('dashboard.login');
     }
 
     public function login(Request $request): RedirectResponse
@@ -44,3 +44,4 @@ class AuthController extends Controller
         return redirect()->route('login');
     }
 }
+
