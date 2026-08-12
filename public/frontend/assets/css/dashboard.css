@@ -1075,3 +1075,65 @@ mark {
     justify-content: flex-start;
   }
 }
+
+@media (min-width: 701px) {
+  .dashboard-modal {
+    align-items: center;
+    padding: 18px;
+  }
+
+  .modal-card {
+    width: min(760px, calc(100vw - 36px));
+    max-height: none;
+    overflow: visible;
+    padding: 18px;
+  }
+
+  .modal-head {
+    margin-bottom: 12px;
+  }
+
+  .modal-head h2 {
+    font-size: 1.28rem;
+  }
+
+  .modal-card .dashboard-form {
+    gap: 9px;
+  }
+
+  .modal-card .form-row {
+    gap: 9px;
+  }
+
+  .modal-card .dashboard-form input,
+  .modal-card .dashboard-form select,
+  .modal-card .dashboard-form textarea {
+    min-height: 39px;
+  }
+
+  .modal-card .dashboard-form textarea {
+    min-height: 64px;
+  }
+
+  .modal-card .form-submit {
+    min-height: 40px;
+  }
+
+  .brand-form-preview,
+  .modal-card .logo-preview {
+    min-height: 72px;
+    padding: 10px;
+  }
+
+  .brand-form-preview img,
+  .modal-card .logo-preview img {
+    max-height: 48px;
+  }
+}
+
+@media (max-height: 680px) and (min-width: 701px) {
+  .modal-card {
+    max-height: calc(100vh - 24px);
+    overflow-y: auto;
+  }
+}
