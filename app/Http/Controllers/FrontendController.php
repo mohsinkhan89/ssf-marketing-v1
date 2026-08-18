@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Mail\ContactAdminNotification;
 use App\Mail\ContactCustomerMessage;
 use App\Models\Campaign;
+use App\Models\ContentPage;
 use App\Models\ContactRequest;
 use App\Models\Review;
 use App\Models\Role;
@@ -17,6 +18,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 
 class FrontendController extends Controller
@@ -59,9 +61,18 @@ class FrontendController extends Controller
         return view('frontend.contact-us');
     }
 
+    public function contentPage(string $slug)
+    {
+        $contentPage = ContentPage::published()->where('slug', $slug)->firstOrFail();
+
+        return view('frontend.content-page', [
+            'contentPage' => $contentPage,
+        ]);
+    }
+
     public function dashboard(string $page = 'campaigns')
     {
-        $allowedPages = ['campaigns', 'users', 'reviews', 'brands', 'contacts', 'reports', 'settings'];
+        $allowedPages = ['campaigns', 'users', 'content-pages', 'reviews', 'brands', 'contacts', 'reports', 'settings'];
 
         abort_unless(in_array($page, $allowedPages, true), 404);
 
@@ -76,6 +87,7 @@ class FrontendController extends Controller
         return view('dashboard.index', [
             'page' => $page,
             'users' => User::with('role')->latest()->get(),
+            'contentPages' => ContentPage::latest()->get(),
             'campaigns' => $campaigns,
             'reviews' => Review::ordered()->get(),
             'trustedBrands' => TrustedBrand::ordered()->get(),
@@ -210,6 +222,33 @@ class FrontendController extends Controller
         $user->delete();
 
         return redirect()->to(route('dashboard.page', 'users'))->with('success', 'User contact deleted successfully.');
+    }
+
+    public function storeContentPage(Request $request): RedirectResponse
+    {
+        $this->authorizeManagement();
+
+        ContentPage::create($this->contentPageData($request));
+
+        return redirect()->to(route('dashboard.page', 'content-pages'))->with('success', 'Content page added successfully.');
+    }
+
+    public function updateContentPage(Request $request, ContentPage $contentPage): RedirectResponse
+    {
+        $this->authorizeManagement();
+
+        $contentPage->update($this->contentPageData($request, $contentPage));
+
+        return redirect()->to(route('dashboard.page', 'content-pages'))->with('success', 'Content page updated successfully.');
+    }
+
+    public function destroyContentPage(ContentPage $contentPage): RedirectResponse
+    {
+        $this->authorizeManagement();
+
+        $contentPage->delete();
+
+        return redirect()->to(route('dashboard.page', 'content-pages'))->with('success', 'Content page deleted successfully.');
     }
 
     public function storeCampaign(Request $request): RedirectResponse
@@ -491,6 +530,48 @@ class FrontendController extends Controller
         return $validated;
     }
 
+    private function contentPageData(Request $request, ?ContentPage $contentPage = null): array
+    {
+        $validated = $request->validate([
+            'title' => ['required', 'string', 'max:255'],
+            'description' => ['required', 'string', 'max:100000'],
+            'status' => ['required', Rule::in(['published', 'draft'])],
+        ]);
+
+        $validated['slug'] = $this->uniqueContentPageSlug($validated['title'], $contentPage?->id);
+        $validated['description'] = $this->sanitizeRichText($validated['description']);
+
+        return $validated;
+    }
+
+    private function uniqueContentPageSlug(string $title, ?int $ignoreId = null): string
+    {
+        $baseSlug = Str::slug($title) ?: 'content-page';
+        $slug = $baseSlug;
+        $counter = 2;
+
+        while (ContentPage::where('slug', $slug)
+            ->when($ignoreId, fn ($query) => $query->whereKeyNot($ignoreId))
+            ->exists()) {
+            $slug = $baseSlug . '-' . $counter;
+            $counter++;
+        }
+
+        return $slug;
+    }
+
+    private function sanitizeRichText(string $html): string
+    {
+        $allowedTags = '<p><br><strong><b><em><i><u><s><strike><sub><sup><ul><ol><li><h1><h2><h3><h4><blockquote><pre><code><a><hr><table><thead><tbody><tr><th><td><span><div><font>';
+        $clean = strip_tags($html, $allowedTags);
+        $clean = preg_replace('/\s+on[a-z]+\s*=\s*("[^"]*"|\'[^\']*\'|[^\s>]+)/i', '', $clean) ?? '';
+        $clean = preg_replace('/\s+(href|src)\s*=\s*("|\')\s*javascript:[^"\']*("|\')/i', ' $1="#"', $clean) ?? '';
+        $clean = preg_replace_callback('/\s+style\s*=\s*("|\')(.*?)("|\')/is', function (array $matches): string {
+            return preg_match('/expression\s*\(|javascript:|url\s*\(/i', $matches[2]) ? '' : ' style="' . e($matches[2]) . '"';
+        }, $clean) ?? '';
+
+        return trim($clean);
+    }
     private function adminNotificationEmails(SiteSetting $siteSetting): array
     {
         return collect(explode(',', (string) $siteSetting->admin_notification_emails))

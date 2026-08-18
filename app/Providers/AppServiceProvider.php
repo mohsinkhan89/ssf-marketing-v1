@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Models\ContentPage;
 use App\Models\SiteSetting;
 use App\Models\SocialLink;
 use Illuminate\Support\Facades\Schema;
@@ -25,6 +26,7 @@ class AppServiceProvider extends ServiceProvider
     {
         View::composer('frontend.*', function ($view) {
             $setting = null;
+            $contentPages = collect();
             $socialLinks = collect();
 
             if (Schema::hasTable('site_settings')) {
@@ -35,7 +37,12 @@ class AppServiceProvider extends ServiceProvider
                 $socialLinks = SocialLink::published()->ordered()->get();
             }
 
+            if (Schema::hasTable('content_pages')) {
+                $contentPages = ContentPage::published()->orderBy('title')->get();
+            }
+
             $view->with('siteSetting', $setting);
+            $view->with('footerContentPages', $contentPages);
             $view->with('footerSocialLinks', $socialLinks);
         });
     }

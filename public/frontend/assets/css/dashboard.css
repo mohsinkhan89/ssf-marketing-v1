@@ -1521,3 +1521,177 @@ mark {
     overflow-y: auto;
   }
 }
+.modal-card-wide {
+  width: min(820px, 100%);
+}
+
+.rich-text-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 8px;
+  border: 1px solid var(--line);
+  border-bottom: 0;
+  border-radius: 8px 8px 0 0;
+  background: #f7fafb;
+}
+
+.rich-text-toolbar button {
+  display: grid;
+  width: 34px;
+  height: 34px;
+  place-items: center;
+  border: 1px solid rgba(203, 217, 223, .9);
+  border-radius: 8px;
+  background: var(--white);
+  color: var(--text);
+  transition: border-color .18s ease, color .18s ease, transform .18s ease;
+}
+
+.rich-text-toolbar button span {
+  font-size: .72rem;
+  font-weight: 900;
+}
+
+.rich-text-toolbar button:hover,
+.rich-text-toolbar button:focus {
+  border-color: var(--brand);
+  color: var(--brand);
+  transform: translateY(-1px);
+}
+
+.rich-text-editor {
+  min-height: 220px;
+  max-height: 430px;
+  overflow-y: auto;
+  border: 1px solid var(--line);
+  border-radius: 0 0 8px 8px;
+  background: #fbfdfe;
+  color: var(--text);
+  padding: 14px;
+  outline: 0;
+  line-height: 1.7;
+}
+
+.rich-text-editor:focus {
+  border-color: var(--brand);
+  background: var(--white);
+  box-shadow: 0 0 0 4px rgba(15, 107, 143, .09);
+}
+
+.rich-text-editor h1,
+.rich-text-editor h2,
+.rich-text-editor h3,
+.rich-text-editor h4 {
+  margin: 12px 0 6px;
+  color: var(--text);
+  line-height: 1.25;
+}
+
+.rich-text-editor p,
+.rich-text-editor ul,
+.rich-text-editor ol,
+.rich-text-editor blockquote {
+  margin: 0 0 10px;
+}
+
+.rich-text-editor ul,
+.rich-text-editor ol {
+  padding-left: 22px;
+}
+
+.rich-text-editor li {
+  margin-bottom: 6px;
+}
+
+.rich-text-editor blockquote {
+  border-left: 3px solid var(--brand);
+  color: var(--muted);
+  padding-left: 12px;
+}
+
+.rich-text-ready .rich-text-source {
+  display: none;
+}
+
+.rich-text-toolbar select {
+  min-height: 34px;
+  border: 1px solid rgba(203, 217, 223, .9);
+  border-radius: 8px;
+  background: var(--white);
+  color: var(--text);
+  padding: 0 8px;
+  font-size: .78rem;
+  font-weight: 800;
+}
+
+.rich-color {
+  display: inline-flex !important;
+  width: 42px;
+  height: 34px;
+  align-items: center;
+  justify-content: center;
+  gap: 0 !important;
+  border: 1px solid rgba(203, 217, 223, .9);
+  border-radius: 8px;
+  background: var(--white);
+  color: var(--text);
+  cursor: pointer;
+}
+
+.rich-color input {
+  position: absolute;
+  width: 1px !important;
+  height: 1px !important;
+  min-height: 1px !important;
+  opacity: 0;
+}
+
+.rich-text-editor a {
+  color: var(--brand);
+  text-decoration: underline;
+}
+
+.rich-text-editor pre {
+  overflow-x: auto;
+  border-radius: 8px;
+  background: #eef5f8;
+  padding: 12px;
+}
+
+.rich-text-editor table {
+  width: 100%;
+  margin: 10px 0;
+  border-collapse: collapse;
+}
+
+.rich-text-editor th,
+.rich-text-editor td {
+  border: 1px solid var(--line);
+  padding: 8px 10px;
+}
+.rich-inline-heading {
+  display: inline;
+  color: var(--text);
+  line-height: 1.2;
+}
+
+.rich-inline-h1 {
+  font-size: 2em;
+  font-weight: 900;
+}
+
+.rich-inline-h2 {
+  font-size: 1.6em;
+  font-weight: 900;
+}
+
+.rich-inline-h3 {
+  font-size: 1.3em;
+  font-weight: 850;
+}
+
+.rich-inline-h4 {
+  font-size: 1.12em;
+  font-weight: 850;
+}

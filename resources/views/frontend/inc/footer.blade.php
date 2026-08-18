@@ -23,18 +23,19 @@
                <div>
                   <h3>Company</h3>
                   <a href="{{ route('home') }}">Home</a
-                  ><a href="about-us.html">About us</a
-                  ><a href="index.html#work">Our work</a
-                  ><a href="index.html#insights">Insights</a
+                  ><a href="{{ route('about-us') }}">About us</a
+                  ><a href="{{ route('home') }}#work">Our work</a
+                  ><a href="{{ route('home') }}#insights">Insights</a
                   ><a href="{{ route('contact-us') }}">Contact</a>
                </div>
+
                <div>
                   <h3>Services</h3>
-                  <a href="seo.html">Search &amp; SEO</a
-                  ><a href="ppc.html">PPC Advertising</a
-                  ><a href="social-media.html">Social Media</a
-                  ><a href="email-marketing.html">Email Marketing</a
-                  ><a href="index.html#services">Services Overview</a>
+                  <a href="{{ route('seo') }}">Search &amp; SEO</a
+                  ><a href="{{ route('ppc') }}">PPC Advertising</a
+                  ><a href="{{ route('social-media') }}">Social Media</a
+                  ><a href="{{ route('email-marketing') }}">Email Marketing</a
+                  ><a href="{{ route('home') }}#services">Services Overview</a>
                </div>
             </div>
             <div class="footer-contact-card">
@@ -52,8 +53,9 @@
          <div class="container footer-bottom">
             <span>&copy; 2026 Markit Agency. All rights reserved.</span>
             <div>
-               <a href="about-us.html">About Markit</a
-               ><a href="{{ route('contact-us') }}">Contact us</a>
+               @foreach ($footerContentPages ?? collect() as $footerContentPage)
+                  <a href="{{ route('content-page.show', $footerContentPage->slug) }}">{{ $footerContentPage->title }}</a>
+               @endforeach
             </div>
          </div>
       </footer>

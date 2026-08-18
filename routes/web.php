@@ -30,6 +30,9 @@ Route::middleware('auth')->group(function () {
     Route::post('/dashboard/users', [FrontendController::class, 'storeUser'])->name('dashboard.users.store');
     Route::put('/dashboard/users/{user}', [FrontendController::class, 'updateUser'])->name('dashboard.users.update');
     Route::delete('/dashboard/users/{user}', [FrontendController::class, 'destroyUser'])->name('dashboard.users.destroy');
+    Route::post('/dashboard/content-pages', [FrontendController::class, 'storeContentPage'])->name('dashboard.content-pages.store');
+    Route::put('/dashboard/content-pages/{contentPage}', [FrontendController::class, 'updateContentPage'])->name('dashboard.content-pages.update');
+    Route::delete('/dashboard/content-pages/{contentPage}', [FrontendController::class, 'destroyContentPage'])->name('dashboard.content-pages.destroy');
     Route::post('/dashboard/campaigns', [FrontendController::class, 'storeCampaign'])->name('dashboard.campaigns.store');
     Route::put('/dashboard/campaigns/{campaign}', [FrontendController::class, 'updateCampaign'])->name('dashboard.campaigns.update');
     Route::delete('/dashboard/campaigns/{campaign}', [FrontendController::class, 'destroyCampaign'])->name('dashboard.campaigns.destroy');
@@ -50,5 +53,4 @@ Route::middleware('auth')->group(function () {
     Route::delete('/dashboard/settings/logo/{type}', [FrontendController::class, 'clearSettingLogo'])->name('dashboard.settings.logo.clear');
 });
 
-
-
+Route::get('/{slug}', [FrontendController::class, 'contentPage'])->name('content-page.show');
