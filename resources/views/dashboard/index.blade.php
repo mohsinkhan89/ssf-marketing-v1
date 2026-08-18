@@ -17,6 +17,7 @@
         $navItems = [
             'campaigns' => ['label' => 'Campaigns', 'icon' => 'fa-bullhorn', 'url' => route('dashboard.page', 'campaigns')],
             'users' => ['label' => 'Users', 'icon' => 'fa-users', 'url' => route('dashboard.page', 'users')],
+            'content-pages' => ['label' => 'Content Pages', 'icon' => 'fa-file-lines', 'url' => route('dashboard.page', 'content-pages')],
             'reviews' => ['label' => 'Reviews', 'icon' => 'fa-star', 'url' => route('dashboard.page', 'reviews')],
             'brands' => ['label' => 'Brands', 'icon' => 'fa-building', 'url' => route('dashboard.page', 'brands')],
             'contacts' => ['label' => 'Contacts', 'icon' => 'fa-inbox', 'url' => route('dashboard.page', 'contacts')],
@@ -152,6 +153,39 @@
                                             @endif
                                         </tr>
                                     @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                    </article>
+                @elseif ($page === 'content-pages')
+                    <section class="page-head">
+                        <div><span class="section-label">Content Pages</span><h2>Privacy & Terms Pages</h2><p>Manage website content pages from the content_pages table. Slugs are generated automatically from the title.</p></div>
+                        @if ($canManageUsers)<button class="primary-action" type="button" data-modal-open="content-page-create">Add page <i class="fa-solid fa-plus"></i></button>@endif
+                    </section>
+
+                    <article class="dashboard-panel table-panel full-panel">
+                        <div class="panel-header"><div><span class="section-label">Content table</span><h2>Dynamic Website Pages</h2></div><mark class="access-badge">{{ $contentPages->where('status', 'published')->count() }} published</mark></div>
+                        <div class="table-wrap">
+                            <table>
+                                <thead><tr><th>Title</th><th>Slug</th><th>Description</th><th>Status</th><th>Updated</th>@if ($canManageUsers)<th>Actions</th>@endif</tr></thead>
+                                <tbody>
+                                    @forelse ($contentPages as $contentPage)
+                                        <tr class="animated-row">
+                                            <td><strong>{{ $contentPage->title }}</strong><span>ID #{{ $contentPage->id }}</span></td>
+                                            <td><a class="table-link" href="{{ route('content-page.show', $contentPage->slug) }}" target="_blank" rel="noopener">/{{ $contentPage->slug }}</a></td>
+                                            <td><strong>{{ Str::limit(strip_tags($contentPage->description), 120) }}</strong></td>
+                                            <td><mark class="status {{ $contentPage->status === 'published' ? 'live' : 'paused' }}">{{ $contentPage->status === 'published' ? 'Published' : 'Draft' }}</mark></td>
+                                            <td>{{ $contentPage->updated_at->format('M d, Y h:i A') }}</td>
+                                            @if ($canManageUsers)
+                                                <td><div class="row-actions">
+                                                    <button class="icon-action" type="button" data-modal-open="content-page-edit-{{ $contentPage->id }}" aria-label="Edit {{ $contentPage->title }}"><i class="fa-solid fa-pen"></i></button>
+                                                    <form method="POST" action="{{ route('dashboard.content-pages.destroy', $contentPage) }}">@csrf @method('DELETE')<button class="danger-button" type="submit" data-confirm-delete aria-label="Delete {{ $contentPage->title }}"><i class="fa-solid fa-trash"></i></button></form>
+                                                </div></td>
+                                            @endif
+                                        </tr>
+                                    @empty
+                                        <tr><td colspan="{{ $canManageUsers ? 6 : 5 }}">No content pages added yet.</td></tr>
+                                    @endforelse
                                 </tbody>
                             </table>
                         </div>
@@ -355,6 +389,20 @@
             </section>
         @endforeach
 
+
+        <section class="dashboard-modal" id="content-page-create" role="dialog" aria-modal="true" aria-labelledby="content-page-create-title" hidden>
+            <div class="modal-card modal-card-wide"><button class="modal-close" type="button" data-modal-close aria-label="Close"><i class="fa-solid fa-xmark"></i></button><div class="modal-head"><span class="section-label">New content page</span><h2 id="content-page-create-title">Add Content Page</h2></div>
+                @include('dashboard.inc.dashboard-content-page-form', ['action' => route('dashboard.content-pages.store'), 'method' => null, 'contentPageRecord' => null])
+            </div>
+        </section>
+
+        @foreach ($contentPages as $contentPage)
+            <section class="dashboard-modal" id="content-page-edit-{{ $contentPage->id }}" role="dialog" aria-modal="true" aria-labelledby="content-page-edit-title-{{ $contentPage->id }}" hidden>
+                <div class="modal-card modal-card-wide"><button class="modal-close" type="button" data-modal-close aria-label="Close"><i class="fa-solid fa-xmark"></i></button><div class="modal-head"><span class="section-label">Edit content page</span><h2 id="content-page-edit-title-{{ $contentPage->id }}">{{ $contentPage->title }}</h2></div>
+                    @include('dashboard.inc.dashboard-content-page-form', ['action' => route('dashboard.content-pages.update', $contentPage), 'method' => 'PUT', 'contentPageRecord' => $contentPage])
+                </div>
+            </section>
+        @endforeach
 
         <section class="dashboard-modal" id="review-create" role="dialog" aria-modal="true" aria-labelledby="review-create-title" hidden>
             <div class="modal-card"><button class="modal-close" type="button" data-modal-close aria-label="Close"><i class="fa-solid fa-xmark"></i></button><div class="modal-head"><span class="section-label">New review</span><h2 id="review-create-title">Add Review</h2></div>
