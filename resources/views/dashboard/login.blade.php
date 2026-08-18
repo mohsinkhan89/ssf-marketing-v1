@@ -9,6 +9,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <script src="https://cdn.lordicon.com/lordicon.js"></script>
     <link rel="stylesheet" href="{{ url('frontend/assets/css/auth.css') }}">
 </head>
 <body>
@@ -19,7 +20,8 @@
             </a>
 
             <div class="login-heading">
-                <h1>Admin <span>Access</span></h1>
+                <h1>Dashboard <span>Access</span></h1>
+                <p>Sign in to manage SSF Marketing content, campaigns, and website updates.</p>
             </div>
 
             @if ($errors->any())
@@ -59,7 +61,7 @@
                     <span>Remember me</span>
                 </label>
 
-                <button type="submit"><span>Login</span></button>
+                <button type="submit" class="login-submit"><span>Sign In</span><lord-icon src="https://cdn.lordicon.com/vduvxizq.json" trigger="hover" target=".login-submit" colors="primary:#ffffff" aria-hidden="true"></lord-icon></button>
             </form>
         </section>
     </main>

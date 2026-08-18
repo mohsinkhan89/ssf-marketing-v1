@@ -119,13 +119,22 @@ button {
 .login-heading h1 {
   margin: 0;
   color: #ffffff;
-  font-size: 1.32rem;
+  font-size: 1.36rem;
   font-weight: 800;
   line-height: 1.2;
 }
 
 .login-heading span {
   color: var(--cyan);
+}
+
+.login-heading p {
+  max-width: 330px;
+  margin: 10px auto 0;
+  color: var(--muted);
+  font-size: .88rem;
+  font-weight: 600;
+  line-height: 1.55;
 }
 
 .alert {
@@ -246,6 +255,12 @@ button {
   letter-spacing: .03em;
   box-shadow: 0 16px 34px rgba(15, 107, 143, .32);
   transition: transform .2s ease, filter .2s ease, box-shadow .2s ease;
+}
+
+.login-form button lord-icon {
+  width: 22px;
+  height: 22px;
+  flex: 0 0 auto;
 }
 
 .login-form button:hover {
