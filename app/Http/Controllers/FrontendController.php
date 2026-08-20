@@ -38,6 +38,11 @@ class FrontendController extends Controller
         ]);
     }
 
+    public function blogDetail()
+    {
+        return view('frontend.blog-detail');
+    }
+
     public function aboutUs()
     {
         return view('frontend.about-us');

@@ -15,6 +15,7 @@ Route::get('/ppc', [FrontendController::class, 'ppc'])->name('ppc');
 Route::get('/social-media', [FrontendController::class, 'socialMedia'])->name('social-media');
 Route::get('/email-marketing', [FrontendController::class, 'emailMarketing'])->name('email-marketing');
 Route::get('/blog', [FrontendController::class, 'blog'])->name('blog');
+Route::get('/blog-detail', [FrontendController::class, 'blogDetail'])->name('blog.detail');
 Route::get('/contact-us', [FrontendController::class, 'contactUs'])->name('contact-us');
 Route::post('/contact-us', [FrontendController::class, 'storeContactRequest'])->name('contact-us.store');
 

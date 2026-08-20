@@ -177,7 +177,7 @@ Blog & Insights - SSF Marketing
                 <div class="blog-card-grid">
                     @foreach ($articles as $article)
                         <article class="blog-card reveal">
-                            <a class="blog-card-image" href="#articles">
+                            <a class="blog-card-image" href="{{ route('blog.detail') }}">
                                 <img src="{{ url($article['image']) }}" alt="{{ $article['title'] }}" />
                             </a>
                             <div class="blog-card-body">
@@ -187,7 +187,7 @@ Blog & Insights - SSF Marketing
                                 </div>
                                 <h2>{{ $article['title'] }}</h2>
                                 <p>{{ $article['excerpt'] }}</p>
-                                <a class="blog-read-link" href="#articles">Read More <i class="fa-solid fa-arrow-right"></i></a>
+                                <a class="blog-read-link" href="{{ route('blog.detail') }}">Read More <i class="fa-solid fa-arrow-right"></i></a>
                             </div>
                         </article>
                     @endforeach
