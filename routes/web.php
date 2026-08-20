@@ -14,6 +14,7 @@ Route::get('/seo', [FrontendController::class, 'seo'])->name('seo');
 Route::get('/ppc', [FrontendController::class, 'ppc'])->name('ppc');
 Route::get('/social-media', [FrontendController::class, 'socialMedia'])->name('social-media');
 Route::get('/email-marketing', [FrontendController::class, 'emailMarketing'])->name('email-marketing');
+Route::get('/blog', [FrontendController::class, 'blog'])->name('blog');
 Route::get('/contact-us', [FrontendController::class, 'contactUs'])->name('contact-us');
 Route::post('/contact-us', [FrontendController::class, 'storeContactRequest'])->name('contact-us.store');
 
@@ -54,3 +55,4 @@ Route::middleware('auth')->group(function () {
 });
 
 Route::get('/{slug}', [FrontendController::class, 'contentPage'])->name('content-page.show');
+

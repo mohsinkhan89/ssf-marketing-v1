@@ -25,7 +25,7 @@
                   <a href="{{ route('home') }}">Home</a
                   ><a href="{{ route('about-us') }}">About us</a
                   ><a href="{{ route('home') }}#work">Our work</a
-                  ><a href="{{ route('home') }}#insights">Insights</a
+                  ><a href="{{ route('blog') }}">Our Blog</a
                   ><a href="{{ route('contact-us') }}">Contact</a>
                </div>
 
@@ -59,6 +59,8 @@
             </div>
          </div>
       </footer>
+
+
 
 
 

@@ -509,8 +509,7 @@ Home - Markit Digital Marketing
                     </div>
                     <h2>Sharp thinking for<br /><em>modern marketers.</em></h2>
                 </div>
-                <a class="text-link insights-link" href="#insights"
-                    >Browse all insights
+                <a class="text-link insights-link" href="{{ route('blog') }}">Browse all insights
                     <lord-icon
                     src="https://cdn.lordicon.com/vduvxizq.json"
                     trigger="hover"

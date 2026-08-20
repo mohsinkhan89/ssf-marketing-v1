@@ -31,6 +31,13 @@ class FrontendController extends Controller
         ]);
     }
 
+    public function blog()
+    {
+        return view('frontend.blog', [
+            'trustedBrands' => TrustedBrand::published()->ordered()->get(),
+        ]);
+    }
+
     public function aboutUs()
     {
         return view('frontend.about-us');
@@ -652,6 +659,7 @@ class FrontendController extends Controller
         abort_unless(auth()->user()?->canManageUsers(), 403);
     }
 }
+
 
 
 

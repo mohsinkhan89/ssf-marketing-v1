@@ -51,7 +51,8 @@ const sharedRevealSelectors = [
   '.seo-hero-copy', '.seo-hero-visual', '.seo-service-cards article', '.seo-benefit-grid article', '.seo-process-line article', '.seo-stat', '.seo-case-card', '.seo-case-metrics div', '.seo-tool-logos span', '.seo-dashboard', '.seo-magnifier',
   '.sm-hero-copy', '.sm-hero-visual', '.sm-service-grid article', '.sm-impact-card', '.sm-result-card', '.sm-platform-grid div', '.sm-case-panel', '.sm-phone', '.sm-process-line article',
   '.ppc-hero-copy', '.ppc-hero-visual', '.ppc-service-grid article', '.ppc-platform-card', '.ppc-check-cards article', '.ppc-process-step', '.ppc-result', '.ppc-case-card', '.ppc-case-visual',
-  '.email-hero-copy', '.email-hero-visual', '.email-service-grid article', '.email-stat-card', '.email-flow article', '.email-deliverability-grid article', '.email-result-card', '.email-campaign-card', '.email-case-metrics div', '.email-case-image', '.email-banner-panel'
+  '.email-hero-copy', '.email-hero-visual', '.email-service-grid article', '.email-stat-card', '.email-flow article', '.email-deliverability-grid article', '.email-result-card', '.email-campaign-card', '.email-case-metrics div', '.email-case-image', '.email-banner-panel',
+  '.blog-hero-copy', '.blog-hero-art', '.blog-search', '.blog-filter-title', '.blog-category-list a', '.blog-toolbar', '.blog-card', '.blog-pagination a'
 ];
 
 document.querySelectorAll(sharedRevealSelectors.join(',')).forEach((element, index) => {
@@ -122,10 +123,11 @@ bindSharedHoverEffects(document.querySelectorAll([
   '.seo-service-cards article', '.seo-benefit-grid article', '.seo-process-line article', '.seo-stat', '.seo-case-card', '.seo-case-metrics div', '.seo-tool-logos span',
   '.sm-service-grid article', '.sm-impact-card', '.sm-result-card', '.sm-platform-grid div', '.sm-case-panel',
   '.ppc-service-grid article', '.ppc-platform-card', '.ppc-check-cards article', '.ppc-process-step', '.ppc-result', '.ppc-case-card',
-  '.email-service-grid article', '.email-stat-card', '.email-flow article', '.email-deliverability-grid article', '.email-result-card', '.email-campaign-card', '.email-case-metrics div'
+  '.email-service-grid article', '.email-stat-card', '.email-flow article', '.email-deliverability-grid article', '.email-result-card', '.email-campaign-card', '.email-case-metrics div',
+  '.blog-card'
 ].join(',')));
 
-document.querySelectorAll('.project-image, .insight-image, .story-image, .seo-hero-image-wrap, .contact-visual, .email-banner-panel, .email-case-image, .ppc-hero-visual, .sm-phone').forEach(media => {
+document.querySelectorAll('.project-image, .insight-image, .story-image, .seo-hero-image-wrap, .contact-visual, .email-banner-panel, .email-case-image, .ppc-hero-visual, .sm-phone, .blog-hero-art, .blog-card-image').forEach(media => {
   media.classList.add('interactive-media');
 });
 
