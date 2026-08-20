@@ -15,7 +15,7 @@ Route::get('/ppc', [FrontendController::class, 'ppc'])->name('ppc');
 Route::get('/social-media', [FrontendController::class, 'socialMedia'])->name('social-media');
 Route::get('/email-marketing', [FrontendController::class, 'emailMarketing'])->name('email-marketing');
 Route::get('/blog', [FrontendController::class, 'blog'])->name('blog');
-Route::get('/blog-detail', [FrontendController::class, 'blogDetail'])->name('blog.detail');
+Route::get('/blog/{blog:slug}', [FrontendController::class, 'blogDetail'])->name('blog.detail');
 Route::get('/contact-us', [FrontendController::class, 'contactUs'])->name('contact-us');
 Route::post('/contact-us', [FrontendController::class, 'storeContactRequest'])->name('contact-us.store');
 
@@ -35,6 +35,9 @@ Route::middleware('auth')->group(function () {
     Route::post('/dashboard/content-pages', [FrontendController::class, 'storeContentPage'])->name('dashboard.content-pages.store');
     Route::put('/dashboard/content-pages/{contentPage}', [FrontendController::class, 'updateContentPage'])->name('dashboard.content-pages.update');
     Route::delete('/dashboard/content-pages/{contentPage}', [FrontendController::class, 'destroyContentPage'])->name('dashboard.content-pages.destroy');
+    Route::post('/dashboard/blogs', [FrontendController::class, 'storeBlog'])->name('dashboard.blogs.store');
+    Route::put('/dashboard/blogs/{blog}', [FrontendController::class, 'updateBlog'])->name('dashboard.blogs.update');
+    Route::delete('/dashboard/blogs/{blog}', [FrontendController::class, 'destroyBlog'])->name('dashboard.blogs.destroy');
     Route::post('/dashboard/campaigns', [FrontendController::class, 'storeCampaign'])->name('dashboard.campaigns.store');
     Route::put('/dashboard/campaigns/{campaign}', [FrontendController::class, 'updateCampaign'])->name('dashboard.campaigns.update');
     Route::delete('/dashboard/campaigns/{campaign}', [FrontendController::class, 'destroyCampaign'])->name('dashboard.campaigns.destroy');

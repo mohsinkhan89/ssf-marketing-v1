@@ -12,84 +12,6 @@ Blog & Insights - SSF Marketing
 @endsection
 
 @section('body')
-@php
-    $categories = [
-        ['name' => 'All Categories', 'count' => 24, 'icon' => 'fa-border-all'],
-        ['name' => 'SEO', 'count' => 6, 'icon' => 'fa-magnifying-glass-chart'],
-        ['name' => 'PPC Advertising', 'count' => 5, 'icon' => 'fa-bullhorn'],
-        ['name' => 'Social Media', 'count' => 4, 'icon' => 'fa-share-nodes'],
-        ['name' => 'Content Marketing', 'count' => 3, 'icon' => 'fa-file-lines'],
-        ['name' => 'Email Marketing', 'count' => 3, 'icon' => 'fa-envelope'],
-        ['name' => 'Analytics', 'count' => 3, 'icon' => 'fa-chart-line'],
-    ];
-
-    $articles = [
-        [
-            'category' => 'SEO',
-            'date' => 'May 20, 2025',
-            'title' => '10 On-Page SEO Best Practices That Actually Work',
-            'excerpt' => 'Learn the on-page SEO techniques that can boost your rankings and drive organic traffic.',
-            'image' => 'frontend/assets/images/our-work/work-local-seo.png',
-        ],
-        [
-            'category' => 'PPC',
-            'date' => 'May 18, 2025',
-            'title' => 'How to Optimize Your PPC Campaigns for Maximum ROI',
-            'excerpt' => 'Discover proven strategies to lower ad spend and increase conversions.',
-            'image' => 'frontend/assets/images/proven-results/proven-dashboard.png',
-        ],
-        [
-            'category' => 'Social Media',
-            'date' => 'May 15, 2025',
-            'title' => 'Social Media Trends to Watch in 2025',
-            'excerpt' => 'Stay ahead of the curve with the latest social media trends shaping the digital world.',
-            'image' => 'frontend/assets/images/our-work/work-social-media.png',
-        ],
-        [
-            'category' => 'Email Marketing',
-            'date' => 'May 12, 2025',
-            'title' => 'Email Marketing Strategies That Boost Engagement',
-            'excerpt' => 'Build stronger connections and drive more conversions with these email marketing tips.',
-            'image' => 'frontend/assets/images/email-marketing/campaign/product-launch.png',
-        ],
-        [
-            'category' => 'Analytics',
-            'date' => 'May 10, 2025',
-            'title' => 'Understanding Data Analytics for Better Decisions',
-            'excerpt' => 'Use data to uncover opportunities and make smarter marketing decisions.',
-            'image' => 'frontend/assets/images/hero-section/hero-dashboard-card.png',
-        ],
-        [
-            'category' => 'Content Marketing',
-            'date' => 'May 8, 2025',
-            'title' => 'Content Marketing: A Complete Guide for 2025',
-            'excerpt' => 'A step-by-step guide to create content that attracts, engages, and converts.',
-            'image' => 'frontend/assets/images/about/about-bg.png',
-        ],
-        [
-            'category' => 'SEO',
-            'date' => 'May 5, 2025',
-            'title' => 'Technical SEO: The Hidden Key to Higher Rankings',
-            'excerpt' => 'Fix technical issues and improve your site performance for better search visibility.',
-            'image' => 'frontend/assets/images/seo/banners/hero-section.png',
-        ],
-        [
-            'category' => 'PPC',
-            'date' => 'May 3, 2025',
-            'title' => 'Remarketing Strategies That Bring Results',
-            'excerpt' => 'Re-engage your audience and turn visitors into loyal customers.',
-            'image' => 'frontend/assets/images/our-work/work-lead-generation.png',
-        ],
-        [
-            'category' => 'Social Media',
-            'date' => 'May 1, 2025',
-            'title' => 'How to Build a Strong Social Media Strategy',
-            'excerpt' => 'A practical guide to building your brand presence and growing your audience.',
-            'image' => 'frontend/assets/images/banner/socialmedia-hero-banner.png',
-        ],
-    ];
-@endphp
-
 <main>
     <section class="blog-hero">
         <div class="hero-glow"></div>
@@ -113,9 +35,7 @@ Blog & Insights - SSF Marketing
                         @forelse ($trustedBrands as $brand)
                             <div class="logo-slide">
                                 @if ($brand->website_url)
-                                    <a href="{{ $brand->website_url }}" target="_blank" rel="noopener" aria-label="Open {{ $brand->name }} website">
-                                        <img src="{{ url($brand->logo_path) }}" alt="{{ $brand->name }}">
-                                    </a>
+                                    <a href="{{ $brand->website_url }}" target="_blank" rel="noopener" aria-label="Open {{ $brand->name }} website"><img src="{{ url($brand->logo_path) }}" alt="{{ $brand->name }}"></a>
                                 @else
                                     <img src="{{ url($brand->logo_path) }}" alt="{{ $brand->name }}">
                                 @endif
@@ -138,18 +58,15 @@ Blog & Insights - SSF Marketing
             <aside class="blog-sidebar">
                 <form class="blog-search" action="{{ route('blog') }}" method="get">
                     <label for="blog-search-input" class="sr-only">Search articles</label>
-                    <input id="blog-search-input" type="search" name="search" placeholder="Search articles..." />
+                    <input id="blog-search-input" type="search" name="search" value="{{ request('search') }}" placeholder="Search articles..." />
                     <button type="submit" aria-label="Search"><i class="fa-solid fa-magnifying-glass"></i></button>
                 </form>
 
-                <div class="blog-filter-title"><i class="fa-solid fa-angle-left"></i> Categories</div>
+                <div class="blog-filter-title"><i class="fa-solid fa-angle-left"></i> Blog Library</div>
                 <div class="blog-category-list">
-                    @foreach ($categories as $index => $category)
-                        <a class="{{ $index === 0 ? 'active' : '' }}" href="{{ route('blog') }}">
-                            <span><i class="fa-solid {{ $category['icon'] }}"></i>{{ $category['name'] }}</span>
-                            <b>{{ $category['count'] }}</b>
-                        </a>
-                    @endforeach
+                    <a class="active" href="{{ route('blog') }}"><span><i class="fa-solid fa-border-all"></i>All Blogs</span><b>{{ $totalBlogs }}</b></a>
+                    <a href="{{ route('blog') }}"><span><i class="fa-solid fa-newspaper"></i>Published</span><b>{{ $totalBlogs }}</b></a>
+                    <a href="{{ route('blog') }}"><span><i class="fa-solid fa-clock"></i>Latest Posts</span><b>{{ $latestBlogs->count() }}</b></a>
                 </div>
 
                 <div class="blog-newsletter">
@@ -170,35 +87,39 @@ Blog & Insights - SSF Marketing
 
             <div class="blog-content">
                 <div class="blog-toolbar">
-                    <p>Showing 1-9 of 24 articles</p>
+                    <p>Showing {{ $blogs->firstItem() ?? 0 }}-{{ $blogs->lastItem() ?? 0 }} of {{ $blogs->total() }} blogs</p>
                     <button type="button">Latest First <i class="fa-solid fa-chevron-down"></i></button>
                 </div>
 
                 <div class="blog-card-grid">
-                    @foreach ($articles as $article)
+                    @forelse ($blogs as $blogRecord)
                         <article class="blog-card reveal">
-                            <a class="blog-card-image" href="{{ route('blog.detail') }}">
-                                <img src="{{ url($article['image']) }}" alt="{{ $article['title'] }}" />
+                            <a class="blog-card-image" href="{{ route('blog.detail', $blogRecord) }}">
+                                <img src="{{ url($blogRecord->card_img ?: $blogRecord->banner_img ?: 'frontend/assets/images/our-work/work-local-seo.png') }}" alt="{{ $blogRecord->title }}" />
                             </a>
                             <div class="blog-card-body">
                                 <div class="blog-card-meta">
-                                    <span>{{ $article['category'] }}</span>
-                                    <time>{{ $article['date'] }}</time>
+                                    <span>Blog</span>
+                                    <time>{{ $blogRecord->created_at->format('M d, Y') }}</time>
                                 </div>
-                                <h2>{{ $article['title'] }}</h2>
-                                <p>{{ $article['excerpt'] }}</p>
-                                <a class="blog-read-link" href="{{ route('blog.detail') }}">Read More <i class="fa-solid fa-arrow-right"></i></a>
+                                <h2>{{ $blogRecord->title }}</h2>
+                                <p>{{ $blogRecord->short_description ?: Str::limit(strip_tags($blogRecord->description), 130) }}</p>
+                                <a class="blog-read-link" href="{{ route('blog.detail', $blogRecord) }}">Read More <i class="fa-solid fa-arrow-right"></i></a>
                             </div>
                         </article>
-                    @endforeach
+                    @empty
+                        <div class="blog-empty-state"><strong>No blogs found.</strong><span>Add published blogs from the dashboard to show them here.</span></div>
+                    @endforelse
                 </div>
 
-                <nav class="blog-pagination" aria-label="Blog pagination">
-                    <a class="active" href="{{ route('blog') }}">1</a>
-                    <a href="{{ route('blog') }}">2</a>
-                    <a href="{{ route('blog') }}">3</a>
-                    <a href="{{ route('blog') }}" aria-label="Next page"><i class="fa-solid fa-arrow-right"></i></a>
-                </nav>
+                @if ($blogs->hasPages())
+                    <nav class="blog-pagination" aria-label="Blog pagination">
+                        @for ($pageNumber = 1; $pageNumber <= $blogs->lastPage(); $pageNumber++)
+                            <a class="{{ $blogs->currentPage() === $pageNumber ? 'active' : '' }}" href="{{ $blogs->url($pageNumber) }}">{{ $pageNumber }}</a>
+                        @endfor
+                        @if ($blogs->hasMorePages())<a href="{{ $blogs->nextPageUrl() }}" aria-label="Next page"><i class="fa-solid fa-arrow-right"></i></a>@endif
+                    </nav>
+                @endif
             </div>
         </div>
     </section>
@@ -211,10 +132,7 @@ Blog & Insights - SSF Marketing
                 <p>Tell us where you want to go. We'll build the smartest route there.</p>
             </div>
             <img class="ready-rocket" src="{{ url('frontend/assets/images/ready-section/rocket-icon.png') }}" alt="" aria-hidden="true" />
-            <a class="button button-primary ready-button" href="mailto:{{ $siteSetting?->email ?? 'hello@markit.com' }}">
-                <span>Let's get started</span>
-                <lord-icon src="https://cdn.lordicon.com/wjyqkiew.json" trigger="hover" target=".ready-button" colors="primary:#ffffff,secondary:#ffffff" aria-hidden="true"></lord-icon>
-            </a>
+            <a class="button button-primary ready-button" href="mailto:{{ $siteSetting?->email ?? 'hello@markit.com' }}"><span>Let's get started</span><lord-icon src="https://cdn.lordicon.com/wjyqkiew.json" trigger="hover" target=".ready-button" colors="primary:#ffffff,secondary:#ffffff" aria-hidden="true"></lord-icon></a>
         </div>
     </section>
 </main>

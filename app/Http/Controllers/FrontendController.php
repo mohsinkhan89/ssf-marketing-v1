@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Mail\ContactAdminNotification;
 use App\Mail\ContactCustomerMessage;
+use App\Models\Blog;
 use App\Models\Campaign;
 use App\Models\ContentPage;
 use App\Models\ContactRequest;
@@ -31,16 +32,35 @@ class FrontendController extends Controller
         ]);
     }
 
-    public function blog()
+    public function blog(Request $request)
     {
+        $blogsQuery = Blog::published()->latest();
+
+        if ($request->filled('search')) {
+            $search = trim((string) $request->query('search'));
+            $blogsQuery->where(function ($query) use ($search) {
+                $query->where('title', 'like', "%{$search}%")
+                    ->orWhere('short_description', 'like', "%{$search}%")
+                    ->orWhere('description', 'like', "%{$search}%");
+            });
+        }
+
         return view('frontend.blog', [
+            'blogs' => $blogsQuery->paginate(9)->withQueryString(),
+            'latestBlogs' => Blog::published()->latest()->take(3)->get(),
+            'totalBlogs' => Blog::published()->count(),
             'trustedBrands' => TrustedBrand::published()->ordered()->get(),
         ]);
     }
 
-    public function blogDetail()
+    public function blogDetail(Blog $blog)
     {
-        return view('frontend.blog-detail');
+        abort_unless($blog->status === 'published', 404);
+
+        return view('frontend.blog-detail', [
+            'blog' => $blog,
+            'relatedBlogs' => Blog::published()->whereKeyNot($blog->id)->latest()->take(3)->get(),
+        ]);
     }
 
     public function aboutUs()
@@ -84,7 +104,7 @@ class FrontendController extends Controller
 
     public function dashboard(string $page = 'campaigns')
     {
-        $allowedPages = ['campaigns', 'users', 'content-pages', 'reviews', 'brands', 'contacts', 'reports', 'settings'];
+        $allowedPages = ['campaigns', 'users', 'content-pages', 'blogs', 'reviews', 'brands', 'contacts', 'reports', 'settings'];
 
         abort_unless(in_array($page, $allowedPages, true), 404);
 
@@ -100,6 +120,7 @@ class FrontendController extends Controller
             'page' => $page,
             'users' => User::with('role')->latest()->get(),
             'contentPages' => ContentPage::latest()->get(),
+            'blogs' => Blog::latest()->get(),
             'campaigns' => $campaigns,
             'reviews' => Review::ordered()->get(),
             'trustedBrands' => TrustedBrand::ordered()->get(),
@@ -263,6 +284,32 @@ class FrontendController extends Controller
         return redirect()->to(route('dashboard.page', 'content-pages'))->with('success', 'Content page deleted successfully.');
     }
 
+    public function storeBlog(Request $request): RedirectResponse
+    {
+        $this->authorizeManagement();
+
+        Blog::create($this->blogData($request));
+
+        return redirect()->to(route('dashboard.page', 'blogs'))->with('success', 'Blog added successfully.');
+    }
+
+    public function updateBlog(Request $request, Blog $blog): RedirectResponse
+    {
+        $this->authorizeManagement();
+
+        $blog->update($this->blogData($request, $blog));
+
+        return redirect()->to(route('dashboard.page', 'blogs'))->with('success', 'Blog updated successfully.');
+    }
+
+    public function destroyBlog(Blog $blog): RedirectResponse
+    {
+        $this->authorizeManagement();
+
+        $blog->delete();
+
+        return redirect()->to(route('dashboard.page', 'blogs'))->with('success', 'Blog deleted successfully.');
+    }
     public function storeCampaign(Request $request): RedirectResponse
     {
         $this->authorizeManagement();
@@ -542,6 +589,65 @@ class FrontendController extends Controller
         return $validated;
     }
 
+    private function blogData(Request $request, ?Blog $blog = null): array
+    {
+        $validated = $request->validate([
+            'title' => ['required', 'string', 'max:255'],
+            'short_description' => ['nullable', 'string', 'max:2000'],
+            'description' => ['required', 'string', 'max:200000'],
+            'status' => ['required', Rule::in(['published', 'draft'])],
+            'card_img' => [$blog ? 'nullable' : 'nullable', 'image', 'max:4096'],
+            'banner_img' => [$blog ? 'nullable' : 'nullable', 'image', 'max:4096'],
+        ]);
+
+        $data = [
+            'title' => $validated['title'],
+            'slug' => $this->uniqueBlogSlug($validated['title'], $blog?->id),
+            'short_description' => $validated['short_description'] ?? null,
+            'description' => $this->sanitizeRichText($validated['description']),
+            'status' => $validated['status'],
+        ];
+
+        if ($request->hasFile('card_img')) {
+            $data['card_img'] = $this->storeBlogImage($validated['card_img'], 'card');
+        }
+
+        if ($request->hasFile('banner_img')) {
+            $data['banner_img'] = $this->storeBlogImage($validated['banner_img'], 'banner');
+        }
+
+        return $data;
+    }
+
+    private function uniqueBlogSlug(string $title, ?int $ignoreId = null): string
+    {
+        $baseSlug = Str::slug($title) ?: 'blog';
+        $slug = $baseSlug;
+        $counter = 2;
+
+        while (Blog::where('slug', $slug)
+            ->when($ignoreId, fn ($query) => $query->whereKeyNot($ignoreId))
+            ->exists()) {
+            $slug = $baseSlug . '-' . $counter;
+            $counter++;
+        }
+
+        return $slug;
+    }
+
+    private function storeBlogImage(UploadedFile $file, string $type): string
+    {
+        $directory = public_path('frontend/assets/images/blogs/uploads');
+
+        if (! is_dir($directory)) {
+            mkdir($directory, 0755, true);
+        }
+
+        $filename = $type . '-' . time() . '-' . uniqid() . '.' . $file->getClientOriginalExtension();
+        $file->move($directory, $filename);
+
+        return 'frontend/assets/images/blogs/uploads/' . $filename;
+    }
     private function contentPageData(Request $request, ?ContentPage $contentPage = null): array
     {
         $validated = $request->validate([

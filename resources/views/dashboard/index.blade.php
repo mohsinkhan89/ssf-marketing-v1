@@ -18,6 +18,7 @@
             'campaigns' => ['label' => 'Campaigns', 'icon' => 'fa-bullhorn', 'url' => route('dashboard.page', 'campaigns')],
             'users' => ['label' => 'Users', 'icon' => 'fa-users', 'url' => route('dashboard.page', 'users')],
             'content-pages' => ['label' => 'Content Pages', 'icon' => 'fa-file-lines', 'url' => route('dashboard.page', 'content-pages')],
+            'blogs' => ['label' => 'Blogs', 'icon' => 'fa-newspaper', 'url' => route('dashboard.page', 'blogs')],
             'reviews' => ['label' => 'Reviews', 'icon' => 'fa-star', 'url' => route('dashboard.page', 'reviews')],
             'brands' => ['label' => 'Brands', 'icon' => 'fa-building', 'url' => route('dashboard.page', 'brands')],
             'contacts' => ['label' => 'Contacts', 'icon' => 'fa-inbox', 'url' => route('dashboard.page', 'contacts')],
@@ -190,7 +191,41 @@
                             </table>
                         </div>
                     </article>
-                @elseif ($page === 'reviews')
+                @elseif ($page === 'blogs')
+                    <section class="page-head">
+                        <div><span class="section-label">Blogs</span><h2>Blog Management</h2><p>Manage dynamic blog posts from the blogs table. Slugs are generated automatically from the title.</p></div>
+                        @if ($canManageUsers)<button class="primary-action" type="button" data-modal-open="blog-create">Add blog <i class="fa-solid fa-plus"></i></button>@endif
+                    </section>
+
+                    <article class="dashboard-panel table-panel full-panel">
+                        <div class="panel-header"><div><span class="section-label">Blog table</span><h2>Dynamic Website Blogs</h2></div><mark class="access-badge">{{ $blogs->where('status', 'published')->count() }} published</mark></div>
+                        <div class="table-wrap">
+                            <table>
+                                <thead><tr><th>Blog</th><th>Slug</th><th>Short Description</th><th>Card Image</th><th>Banner Image</th><th>Status</th><th>Updated</th>@if ($canManageUsers)<th>Actions</th>@endif</tr></thead>
+                                <tbody>
+                                    @forelse ($blogs as $blogRecord)
+                                        <tr class="animated-row">
+                                            <td><strong>{{ $blogRecord->title }}</strong><span>ID #{{ $blogRecord->id }}</span></td>
+                                            <td><a class="table-link" href="{{ $blogRecord->status === 'published' ? route('blog.detail', $blogRecord) : route('dashboard.page', 'blogs') }}" target="_blank" rel="noopener">/{{ $blogRecord->slug }}</a></td>
+                                            <td><strong>{{ Str::limit($blogRecord->short_description ?: strip_tags($blogRecord->description), 110) }}</strong></td>
+                                            <td>@if ($blogRecord->card_img)<div class="brand-logo-cell"><img src="{{ url($blogRecord->card_img) }}" alt="{{ $blogRecord->title }} card image"></div>@else<span>No image</span>@endif</td>
+                                            <td>@if ($blogRecord->banner_img)<div class="brand-logo-cell"><img src="{{ url($blogRecord->banner_img) }}" alt="{{ $blogRecord->title }} banner image"></div>@else<span>No image</span>@endif</td>
+                                            <td><mark class="status {{ $blogRecord->status === 'published' ? 'live' : 'paused' }}">{{ $blogRecord->status === 'published' ? 'Published' : 'Draft' }}</mark></td>
+                                            <td>{{ $blogRecord->updated_at->format('M d, Y h:i A') }}</td>
+                                            @if ($canManageUsers)
+                                                <td><div class="row-actions">
+                                                    <button class="icon-action" type="button" data-modal-open="blog-edit-{{ $blogRecord->id }}" aria-label="Edit {{ $blogRecord->title }}"><i class="fa-solid fa-pen"></i></button>
+                                                    <form method="POST" action="{{ route('dashboard.blogs.destroy', $blogRecord) }}">@csrf @method('DELETE')<button class="danger-button" type="submit" data-confirm-delete aria-label="Delete {{ $blogRecord->title }}"><i class="fa-solid fa-trash"></i></button></form>
+                                                </div></td>
+                                            @endif
+                                        </tr>
+                                    @empty
+                                        <tr><td colspan="{{ $canManageUsers ? 8 : 7 }}">No blogs added yet.</td></tr>
+                                    @endforelse
+                                </tbody>
+                            </table>
+                        </div>
+                    </article>                @elseif ($page === 'reviews')
                     <section class="page-head">
                         <div><span class="section-label">Reviews</span><h2>Client Reviews</h2><p>Manage testimonials shown on the website slider.</p></div>
                         @if ($canManageUsers)<button class="primary-action" type="button" data-modal-open="review-create">Add review <i class="fa-solid fa-plus"></i></button>@endif
@@ -404,6 +439,20 @@
             </section>
         @endforeach
 
+
+        <section class="dashboard-modal" id="blog-create" role="dialog" aria-modal="true" aria-labelledby="blog-create-title" hidden>
+            <div class="modal-card modal-card-wide"><button class="modal-close" type="button" data-modal-close aria-label="Close"><i class="fa-solid fa-xmark"></i></button><div class="modal-head"><span class="section-label">New blog</span><h2 id="blog-create-title">Add Blog</h2></div>
+                @include('dashboard.inc.dashboard-blog-form', ['action' => route('dashboard.blogs.store'), 'method' => null, 'blogRecord' => null])
+            </div>
+        </section>
+
+        @foreach ($blogs as $blogRecord)
+            <section class="dashboard-modal" id="blog-edit-{{ $blogRecord->id }}" role="dialog" aria-modal="true" aria-labelledby="blog-edit-title-{{ $blogRecord->id }}" hidden>
+                <div class="modal-card modal-card-wide"><button class="modal-close" type="button" data-modal-close aria-label="Close"><i class="fa-solid fa-xmark"></i></button><div class="modal-head"><span class="section-label">Edit blog</span><h2 id="blog-edit-title-{{ $blogRecord->id }}">{{ $blogRecord->title }}</h2></div>
+                    @include('dashboard.inc.dashboard-blog-form', ['action' => route('dashboard.blogs.update', $blogRecord), 'method' => 'PUT', 'blogRecord' => $blogRecord])
+                </div>
+            </section>
+        @endforeach
         <section class="dashboard-modal" id="review-create" role="dialog" aria-modal="true" aria-labelledby="review-create-title" hidden>
             <div class="modal-card"><button class="modal-close" type="button" data-modal-close aria-label="Close"><i class="fa-solid fa-xmark"></i></button><div class="modal-head"><span class="section-label">New review</span><h2 id="review-create-title">Add Review</h2></div>
                 @include('dashboard.inc.dashboard-review-form', ['action' => route('dashboard.reviews.store'), 'method' => null, 'reviewRecord' => null])
