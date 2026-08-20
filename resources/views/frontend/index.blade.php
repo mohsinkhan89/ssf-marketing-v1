@@ -72,7 +72,7 @@ Home - Markit Digital Marketing
                         <div>
                         <small>Campaign growth</small><strong>+45.8%</strong>
                         </div>
-                        <span class="trend">↗</span>
+                        <span class="trend">â†—</span>
                     </div>
                     <div class="roi-chip">
                         <small>ROAS</small><strong>6.4x</strong
@@ -175,7 +175,7 @@ Home - Markit Digital Marketing
                 <p>
                     Good marketing looks great. Great marketing creates
                     business outcomes. We blend strategy, creative and
-                    analytics into one focused team—so every campaign has a
+                    analytics into one focused teamâ€”so every campaign has a
                     clear reason to exist and a number to move.
                 </p>
                 <div class="feature-list">
@@ -242,7 +242,7 @@ Home - Markit Digital Marketing
                     Own high-intent demand with technical SEO, content and
                     search strategies that compound.
                     </p>
-                    <a href="seo.html">Explore service <span>↗</span></a>
+                    <a href="seo.html">Explore service <span>â†—</span></a>
                 </article>
                 <article class="service-card reveal">
                     <span class="service-number">02</span
@@ -256,9 +256,9 @@ Home - Markit Digital Marketing
                     <h3>Paid Media</h3>
                     <p>
                     Efficient acquisition across Google, Meta and emerging
-                    channels—built around profit.
+                    channelsâ€”built around profit.
                     </p>
-                    <a href="ppc.html">Explore service <span>↗</span></a>
+                    <a href="ppc.html">Explore service <span>â†—</span></a>
                 </article>
                 <article class="service-card reveal">
                     <span class="service-number">03</span
@@ -275,7 +275,7 @@ Home - Markit Digital Marketing
                     scroll and inspire action.
                     </p>
                     <a href="social-media.html"
-                    >Explore service <span>↗</span></a
+                    >Explore service <span>â†—</span></a
                     >
                 </article>
                 <article class="service-card reveal">
@@ -292,7 +292,7 @@ Home - Markit Digital Marketing
                     Turn more visits into revenue through testing, clean
                     data and sharper user journeys.
                     </p>
-                    <a href="#contact">Explore service <span>↗</span></a>
+                    <a href="#contact">Explore service <span>â†—</span></a>
                 </article>
             </div>
         </div>
@@ -324,7 +324,7 @@ Home - Markit Digital Marketing
                     <strong
                         class="counter"
                         data-value="32"
-                        data-prefix="−"
+                        data-prefix="âˆ’"
                         data-suffix="%"
                         >0</strong
                     ><span>Lower acquisition cost</span>
@@ -339,9 +339,9 @@ Home - Markit Digital Marketing
                     </div>
                 </div>
                 <div class="result-points">
-                    <span><i>✓</i> Live performance dashboards</span
-                    ><span><i>✓</i> Weekly strategy insights</span
-                    ><span><i>✓</i> Clear commercial KPIs</span>
+                    <span><i>âœ“</i> Live performance dashboards</span
+                    ><span><i>âœ“</i> Weekly strategy insights</span
+                    ><span><i>âœ“</i> Clear commercial KPIs</span>
                 </div>
                 <a class="button result-button" href="#work"
                     ><span>Explore our results</span
@@ -407,7 +407,7 @@ Home - Markit Digital Marketing
                     <img
                         src="{{ url('frontend/assets/images/our-work/work-ecommerce-growth.png') }}"
                         alt="E-commerce growth project"
-                    /><span>View case study ↗</span>
+                    /><span>View case study â†—</span>
                     </div>
                     <div class="project-info">
                     <div>
@@ -422,7 +422,7 @@ Home - Markit Digital Marketing
                     <img
                         src="{{ url('frontend/assets/images/our-work/work-lead-generation.png') }}"
                         alt="Lead generation project"
-                    /><span>View case study ↗</span>
+                    /><span>View case study â†—</span>
                     </div>
                     <div class="project-info">
                     <div>
@@ -437,7 +437,7 @@ Home - Markit Digital Marketing
                     <img
                         src="{{ url('frontend/assets/images/our-work/work-social-media.png') }}"
                         alt="Social media project"
-                    /><span>View case study ↗</span>
+                    /><span>View case study â†—</span>
                     </div>
                     <div class="project-info">
                     <div>
@@ -464,13 +464,13 @@ Home - Markit Digital Marketing
                     type="button"
                     aria-label="Previous testimonial"
                     >
-                    ←</button
+                    â†</button
                     ><button
                     id="next"
                     type="button"
                     aria-label="Next testimonial"
                     >
-                    →
+                    â†’
                     </button>
                 </div>
             </div>
@@ -486,12 +486,12 @@ Home - Markit Digital Marketing
             @endphp
             <div class="testimonial-card reveal" id="testimonial" data-testimonials='@json($testimonialItems, JSON_HEX_APOS | JSON_HEX_QUOT)'>
                 @if ($firstReview)
-                    <div class="quote-mark">“</div>
+                    <div class="quote-mark">â€œ</div>
                     <div class="stars">@for ($star = 0; $star < $firstReview->rating; $star++)<i class="fa-solid fa-star"></i>@endfor</div>
                     <blockquote>{{ $firstReview->quote }}</blockquote>
                     <div class="client"><span>{{ $firstReview->initials }}</span><div><b>{{ $firstReview->client_name }}</b><small>{{ $firstReview->client_role }}</small></div></div>
                 @else
-                    <div class="quote-mark">“</div>
+                    <div class="quote-mark">â€œ</div>
                     <div class="stars"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i></div>
                     <blockquote>No reviews added yet.</blockquote>
                     <div class="client"><span>SS</span><div><b>SSF Marketing</b><small>Client stories</small></div></div>
@@ -520,53 +520,39 @@ Home - Markit Digital Marketing
                 ></a>
             </div>
             <div class="insight-grid">
-                <article class="insight-card reveal">
-                    <div class="insight-image">
-                    <img
-                        src="{{ url('frontend/assets/images/our-work/work-local-seo.png') }}"
-                        alt="SEO performance dashboard"
-                    /><span>SEO</span>
-                    </div>
-                    <div>
-                    <small>6 min read</small>
-                    <h3>
-                        Five SEO shifts shaping profitable growth in 2026
-                    </h3>
-                    <a href="#contact">Read article ↗</a>
-                    </div>
-                </article>
-                <article class="insight-card reveal">
-                    <div class="insight-image">
-                    <img
-                        src="{{ url('frontend/assets/images/our-work/work-lead-generation.png') }}"
-                        alt="Paid advertising dashboard"
-                    /><span>Paid Media</span>
-                    </div>
-                    <div>
-                    <small>8 min read</small>
-                    <h3>
-                        How to scale ad spend without sacrificing efficiency
-                    </h3>
-                    <a href="#contact">Read article ↗</a>
-                    </div>
-                </article>
-                <article class="insight-card reveal">
-                    <div class="insight-image">
-                    <img
-                        src="{{ url('frontend/assets/images/our-work/work-social-media.png') }}"
-                        alt="Social campaign dashboard"
-                    /><span>Creative</span>
-                    </div>
-                    <div>
-                    <small>5 min read</small>
-                    <h3>
-                        The creative testing system behind winning campaigns
-                    </h3>
-                    <a href="#contact">Read article ↗</a>
-                    </div>
-                </article>
+                @forelse ($latestBlogs as $blogRecord)
+                    @php
+                        $blogImage = $blogRecord->card_img ?: $blogRecord->banner_img ?: 'frontend/assets/images/our-work/work-local-seo.png';
+                        $blogExcerpt = $blogRecord->short_description ?: Str::limit(strip_tags($blogRecord->description), 120);
+                    @endphp
+                    <article class="insight-card reveal">
+                        <a class="insight-image" href="{{ route('blog.detail', $blogRecord) }}">
+                            <img src="{{ url($blogImage) }}" alt="{{ $blogRecord->title }}" />
+                            <span>Blog</span>
+                        </a>
+                        <div>
+                            <small>{{ $blogRecord->created_at?->format('M d, Y') }} / {{ ceil(str_word_count(strip_tags($blogRecord->description)) / 180) ?: 1 }} min read</small>
+                            <h3>{{ $blogRecord->title }}</h3>
+                            @if ($blogExcerpt)
+                                <p>{{ $blogExcerpt }}</p>
+                            @endif
+                            <a href="{{ route('blog.detail', $blogRecord) }}">Read article <i class="fa-solid fa-arrow-right"></i></a>
+                        </div>
+                    </article>
+                @empty
+                    <article class="insight-card reveal">
+                        <div class="insight-image">
+                            <img src="{{ url('frontend/assets/images/our-work/work-local-seo.png') }}" alt="SEO performance dashboard" />
+                            <span>Blog</span>
+                        </div>
+                        <div>
+                            <small>Coming soon</small>
+                            <h3>Fresh growth insights will appear here.</h3>
+                            <a href="{{ route('blog') }}">Browse insights <i class="fa-solid fa-arrow-right"></i></a>
+                        </div>
+                    </article>
+                @endforelse
             </div>
-        </div>
         </section>
 
         <section class="ready-cta" id="contact">
@@ -575,7 +561,7 @@ Home - Markit Digital Marketing
                 <div class="kicker"><span></span> Your next chapter</div>
                 <h2>Ready to grow <em>your business?</em></h2>
                 <p>
-                    Tell us where you want to go. We’ll build the smartest
+                    Tell us where you want to go. Weâ€™ll build the smartest
                     route there.
                 </p>
             </div>
@@ -587,7 +573,7 @@ Home - Markit Digital Marketing
             /><a
                 class="button button-primary ready-button"
                 href="mailto:hello@markit.com"
-                ><span>Let’s get started</span
+                ><span>Letâ€™s get started</span
                 ><lord-icon
                     src="https://cdn.lordicon.com/wjyqkiew.json"
                     trigger="hover"

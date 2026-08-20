@@ -29,6 +29,7 @@ class FrontendController extends Controller
         return view('frontend.index', [
             'reviews' => Review::published()->ordered()->get(),
             'trustedBrands' => TrustedBrand::published()->ordered()->get(),
+            'latestBlogs' => Blog::published()->latest()->take(3)->get(),
         ]);
     }
 
